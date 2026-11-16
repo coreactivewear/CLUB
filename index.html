@@ -49,6 +49,21 @@ button{cursor:pointer}
 .lockup.splogo{width:190px;animation:spIn .9s ease both}.lockup.splogo .aw{font-size:13.5px;margin-top:7px}
 .slogan-txt{font-family:var(--font-display);font-variation-settings:"SOFT" 100;font-weight:900;font-size:22px;line-height:1.02;text-align:center;margin:0;color:var(--ink)}
 .slogan-txt.sm{font-size:18px}
+.logo-btn{border:0;background:none;padding:4px 2px;margin:-4px -2px;border-radius:8px;cursor:pointer;display:flex}
+.exlink{border:0;background:none;padding:0;font:inherit;color:inherit;text-align:left;text-decoration:underline;text-decoration-color:var(--beige);text-underline-offset:3px;cursor:pointer}
+.evo .exlink{font-weight:700}
+.likechip{padding:0;overflow:hidden}
+.likechip .exlink{padding:5px 10px;text-decoration:none;font-family:var(--font-label);font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.likes .lrow .exlink{flex:1;text-decoration:none}
+.sheet-ov{position:fixed;inset:0;z-index:40;background:rgba(22,20,18,.38);display:flex;align-items:flex-end;justify-content:center;animation:fadeIn .2s ease}
+.sheet{width:100%;max-width:480px;max-height:88vh;overflow:auto;background:var(--bg);border-radius:22px 22px 0 0;padding:18px 16px 26px;display:flex;flex-direction:column;gap:12px;animation:sheetUp .28s ease}
+.rbtn.sm{width:36px;height:36px;font-size:15px}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.sheet,.sheet-ov{animation:none}}
+.cyrows{display:flex;flex-direction:column;gap:8px}
+.cyrow{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 .langs{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:2px;background:var(--surface)}
 .langs button{border:0;background:none;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:700;font-family:var(--font-label);color:var(--muted)}
 .langs button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
@@ -278,6 +293,10 @@ p{margin:0}
 .pl-veg{left:0;top:0;width:50%;height:100%;background:#9DB08A}
 .pl-pro{right:0;top:0;width:50%;height:50%;background:#C9A383}
 .pl-carb{right:0;bottom:0;width:50%;height:50%;background:#E6D3A8}
+.plate .pl-fat{width:24px;height:24px;border-radius:50%;background:#D9B84E;left:calc(50% - 12px);top:calc(50% - 12px);box-shadow:0 0 0 3px #fff}
+.legend{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.legend li{display:flex;gap:10px;align-items:flex-start}
+.legend .dot{flex:none;width:14px;height:14px;border-radius:50%;margin-top:3px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
 /* nav, rest, toast */
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-top:1px solid var(--line)}
 .nav>div{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(var(--cols,4),1fr)}
@@ -372,7 +391,7 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 <body>
 <div class="app" id="app">
   <header class="bar">
-    <span id="barLogo"></span>
+    <button type="button" id="barLogo" class="logo-btn" data-act="logoHome" aria-label="Inicio"></button>
     <div class="langs" role="group" aria-label="Language">
       <button type="button" data-lang="es">ES</button>
       <button type="button" data-lang="en">EN</button>
@@ -2407,7 +2426,7 @@ function vAbs(){
       <div class="rowline"><div><span class="eyebrow">${t("lvl_l")[r.lvl]} · ${r.min} ${t("min")}</span><h3>${t("abs_r")[r.id]}</h3></div>
         <button type="button" class="btn sm" ${ok?`data-routine="${r.id}"`:`data-nav="plans"`}>${ok?PLAY+" "+t("play"):LOCK+" "+t("see_plans")}</button></div>
       <p class="small muted">${t("abs_d")[r.id]} ${fmt(t("rounds"),{n:r.rounds})} · ${t("work")} ${r.work} ${t("sec")} / ${t("restW")} ${r.rest} ${t("sec")}</p>
-      <div class="chips">${r.ex.map(id=>`<span class="chip plain">${esc(exName(id))}</span>`).join("")}</div>
+      <div class="chips">${r.ex.map(id=>`<span class="chip plain likechip">${exLink(id)}</span>`).join("")}</div>
     </div>`;}).join("")}`;
 }
 
@@ -2452,7 +2471,7 @@ function vProgress(){
   const n=totalDone(), ins=insight();
   const rows=Object.keys(S.hist).filter(id=>EX[id]&&S.hist[id].length).map(id=>{
     const h=S.hist[id].slice(-10), useKg=h.some(x=>x.kg>0), best=bestEntry(id);
-    return `<div class="evo"><div><b>${esc(exName(id))}</b><small class="muted">${fmt(t("record"),{v:fmtEntry(best)})}</small></div>${spark(h.map(x=>useKg?(x.kg||0):(x.reps||0)))}</div>`;}).join("");
+    return `<div class="evo"><div>${exLink(id)}<small class="muted">${fmt(t("record"),{v:fmtEntry(best)})}</small></div>${spark(h.map(x=>useKg?(x.kg||0):(x.reps||0)))}</div>`;}).join("");
   const tb=S.test[S.block]||S.test, hasTest=tb&&(tb.push||tb.squat||tb.plank);
   return `<h1>${t("prog_title")}</h1>
   <div class="stats">
@@ -2468,9 +2487,9 @@ function vProgress(){
     <div class="row"><span>${t("t_plank")}</span><b>${esc(tb.plank||"–")}</b></div></div></div>`:""}
   ${vPhotos()}
   <div class="card"><span class="eyebrow">${t("share_t")}</span>
-    <p class="small muted">${fmt(t("share_b"),{h:HANDLES[S.country]||HANDLES.ve})}</p>
+    <p class="small muted">${fmt(t("share_hint"),{h:HANDLES[S.country]||HANDLES.ve})}</p>
     <div id="shareOut"></div>
-    <button type="button" class="btn block" data-act="share">${t("share_make")}</button></div>
+    <button type="button" class="btn block" data-act="share">${t("share_btn")}</button></div>
   ${communityCard()}`;
 }
 function vPhotos(){
@@ -2547,8 +2566,8 @@ function vNutrition(){
     ${w?`<p class="big-num">${a}–${b} g</p><p class="small">${fmt(t("nu_target"),{a,b})}</p>`:""}
     <h4>${t("nu_sources")}</h4><div class="rows">${t("nu_src").map(([n,g])=>`<div class="row"><span>${n}</span><b>≈ ${g} g</b></div>`).join("")}</div></div>
   <div class="card"><h3>${t("nu_plate")}</h3>
-    <div class="plate"><div class="pl-veg"></div><div class="pl-pro"></div><div class="pl-carb"></div></div>
-    <ul class="list small">${t("nu_plate_items").map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    <div class="plate"><div class="pl-veg"></div><div class="pl-pro"></div><div class="pl-carb"></div><div class="pl-fat"></div></div>
+    <ul class="legend small">${t("nu_plate_items").map((x,i)=>`<li><i class="dot" style="background:${["#9DB08A","#C9A383","#E6D3A8","#D9B84E"][i]}"></i><span>${x}</span></li>`).join("")}</ul></div>
   <div class="card"><h3>${t("nu_ideas")}</h3>${t("nu_meals").map(([m,xs])=>`<h4>${m}</h4><ul class="list small">${xs.map(x=>`<li>${x}</li>`).join("")}</ul>`).join("")}</div>
   <p class="note">${t("nu_note")}</p>`;
 }
@@ -2631,7 +2650,7 @@ async function makeStory(){
   if(ins) x.fillText(`${exName(ins.id)}: ${ins.txt}`,W/2,960); else if(best) x.fillText(`${exName(best[0])}: ${best[1].kg} kg`,W/2,960);
   // figure
   const fc=document.createElement("canvas"); fc.width=900; fc.height=560;
-  const id=S.fav&&ANIM[S.fav]?S.fav:"hip_thrust";
+  const id=(S.favs||[]).find(x=>ANIM[x])||"hip_thrust";
   readColors(); drawViewer({canvas:fc,id,mode:"ok",playing:false,t:0,last:0,W:900,H:560,dpr:1,noLabel:true,center:true,maxSc:4},0);
   x.drawImage(fc,90,1000);
   x.fillStyle="#161412"; x.textAlign="center"; x.font="900 82px Fraunces, Georgia, serif"; x.fillText("girl,",W/2,1715); x.fillText("do it for you!",W/2,1800);
@@ -2697,7 +2716,7 @@ function vMobility(){
       <div class="rowline"><div><span class="eyebrow">${t("lvl_l")[r.lvl]} · ${r.min} ${t("min")}</span><h3>${t("mob_r")[r.id]}</h3></div>
         <button type="button" class="btn sm" ${ok?`data-routine="${r.id}"`:`data-nav="plans"`}>${ok?PLAY+" "+t("play"):LOCK+" "+t("see_plans")}</button></div>
       <p class="small muted">${t("mob_d")[r.id]} ${fmt(t("rounds"),{n:r.rounds})} · ${t("work")} ${r.work} ${t("sec")} / ${t("restW")} ${r.rest} ${t("sec")}</p>
-      <div class="chips">${r.ex.map(id=>`<span class="chip plain">${esc(exName(id))}</span>`).join("")}</div>
+      <div class="chips">${r.ex.map(id=>`<span class="chip plain likechip">${exLink(id)}</span>`).join("")}</div>
     </div>`;}).join("")}`;
 }
 /* splash on launch */
@@ -3011,6 +3030,166 @@ function setLog(field,val){
 
 
 /* =========================================================
+   v-next overrides: multi favourites, editable cycle history,
+   exercise info sheet, logo → home
+   ========================================================= */
+Object.assign(T.es,{cy_hist_sub:"Si te equivocaste, cambia la fecha o elimínala.",cy_add:"Añadir un periodo anterior",cy_del:"Eliminar",cy_none_yet:"Aún no has registrado ningún periodo.",
+  lk_none_list:"Ninguno todavía",ex_info:"Ver ejercicio",home_lbl:"Ir al inicio"});
+Object.assign(T.en,{cy_hist_sub:"If you made a mistake, change the date or delete it.",cy_add:"Add an earlier period",cy_del:"Delete",cy_none_yet:"You haven't logged any period yet.",
+  lk_none_list:"None yet",ex_info:"View exercise",home_lbl:"Go to home"});
+Object.assign(T.ru,{cy_hist_sub:"Если ошиблись, измените дату или удалите её.",cy_add:"Добавить прошлые месячные",cy_del:"Удалить",cy_none_yet:"Вы ещё не отмечали месячные.",
+  lk_none_list:"Пока нет",ex_info:"Смотреть упражнение",home_lbl:"На главную"});
+
+/* ---- favourites: unlimited lists ---- */
+if(!Array.isArray(S.favs)) S.favs=S.fav?[S.fav]:[];
+if(!Array.isArray(S.diss)) S.diss=S.dis?[S.dis]:[];
+const isLiked=(f,id)=>(f==="fav"?S.favs:S.diss).includes(id);
+function likeBtns(id){
+  return `<span class="lbtns"><button type="button" class="lbtn" data-like="fav" data-id="${id}" aria-pressed="${isLiked("fav",id)}">${t("fav")}</button><button type="button" class="lbtn" data-like="dis" data-id="${id}" aria-pressed="${isLiked("dis",id)}">${t("dis")}</button></span>`;
+}
+function toggleLike(f,id){
+  const L=f==="fav"?S.favs:S.diss, O=f==="fav"?S.diss:S.favs;
+  const i=L.indexOf(id); if(i>=0) L.splice(i,1); else {L.push(id); const j=O.indexOf(id); if(j>=0) O.splice(j,1);}
+  S.fav=S.favs[0]||""; S.dis=S.diss[0]||""; save();
+}
+const exLink=id=>`<button type="button" class="exlink" data-exinfo="${id}">${esc(exName(id))}</button>`;
+function vDiaryLikes(){
+  const groups=[...["A","B","C"].map(d=>[dayTitle(d),[...new Set([...dayList(d,1),...dayList(d,2)].map(resolveEx))]]),[t("abs_t"),Object.keys(ABS_EX)],[t("mob_t"),Object.keys(MOB_EX)]];
+  const list=arr=>arr.length?`<div class="chips">${arr.map(id=>`<span class="chip plain likechip">${exLink(id)}</span>`).join("")}</div>`:`<p class="small muted">${t("lk_none_list")}</p>`;
+  return `<div class="card"><h3>${t("lk_title")}</h3><p class="small muted">${t("lk_sub")}</p>
+    <h4>${t("lk_fav")} · ${S.favs.length}</h4>${list(S.favs)}
+    <h4>${t("lk_dis")} · ${S.diss.length}</h4>${list(S.diss)}</div>
+  <div class="card likes">${groups.map(([title,ids])=>`<h4>${title}</h4>${ids.map(id=>`<div class="lrow">${exLink(id)}${likeBtns(id)}</div>`).join("")}`).join("")}</div>`;
+}
+
+/* ---- menstrual cycle: editable history ---- */
+function syncCycle(){
+  S.cycle.hist=[...new Set(S.cycle.hist.filter(Boolean))].filter(d=>d<=dkey(new Date())).sort().slice(-24);
+  S.cycle.last=S.cycle.hist.length?S.cycle.hist[S.cycle.hist.length-1]:"";
+  save();
+}
+function vDiaryCycle(){
+  const ci=cycleInfo(new Date()); let viz="";
+  if(ci){
+    const seg=(n,c)=>`<i style="width:${n/ci.len*100}%;background:${c}"></i>`;
+    const fol=Math.max(0,ci.ov-1-ci.plen-1), lut=Math.max(0,ci.len-(ci.ov+1));
+    viz=`<div class="card">
+      <h3>${t("phases")[ci.phase]}</h3><p class="small muted">${fmt(t("cy_day"),{d:ci.day})} · ${fmt(t("cy_next"),{f:fmtDay(ci.next,{day:"numeric",month:"long"})})}</p>
+      <div class="cycbar">${seg(ci.plen,"var(--err)")}${seg(fol+1,"var(--soft)")}${seg(3,"var(--beige)")}${seg(lut,"var(--line)")}<b style="left:calc(${(ci.day-0.5)/ci.len*100}% - 2px)"></b></div>
+      <div class="chips">${t("phases").map((p,i)=>`<span class="chip ${i===ci.phase?"":"plain"}">${p}</span>`).join("")}</div>
+      <p class="small">${t("ptips")[ci.phase]}</p></div>`;
+  }
+  const hs=[...S.cycle.hist].sort().reverse(), today=dkey(new Date());
+  return `${viz||`<div class="card"><h3>${t("cy_title")}</h3><p class="small muted">${t("cy_empty")}</p></div>`}
+  <div class="card">
+    ${S.cycle.hist.includes(today)?"":`<button type="button" class="btn block" data-act="periodToday">${t("cy_start")}</button>`}
+    <h4>${t("cy_hist")}</h4>
+    <p class="small muted">${hs.length?t("cy_hist_sub"):t("cy_none_yet")}</p>
+    <div class="cyrows">
+      ${hs.length?hs.map((d,i)=>`<div class="cyrow"><label class="sr" for="cyh${i}">${t("cy_last")}</label>
+        <input class="input" type="date" id="cyh${i}" data-cyh="${d}" max="${today}" value="${d}">
+        <button type="button" class="btn ghost sm" data-cydel="${d}" aria-label="${t("cy_del")} ${d}">${t("cy_del")}</button></div>`).join("")
+      :`<div class="field"><label for="cyNew">${t("cy_last")}</label><input class="input" type="date" id="cyNew" data-cyh="" max="${today}"></div>`}
+    </div>
+    ${hs.length?`<button type="button" class="btn ghost sm" data-act="cyAdd">+ ${t("cy_add")}</button>`:""}
+    ${S.cycle.hist.length>1?`<p class="small muted">${fmt(t("cy_avg"),{n:cycleLen()})}</p>`:""}
+    <div class="grid2">
+      <div class="field"><label for="cyLen">${t("cy_len")}</label><input class="input" type="number" inputmode="numeric" min="18" max="45" id="cyLen" data-cy="len" value="${esc(S.cycle.len)}"></div>
+      <div class="field"><label for="cyPlen">${t("cy_plen")}</label><input class="input" type="number" inputmode="numeric" min="2" max="10" id="cyPlen" data-cy="plen" value="${esc(S.cycle.plen)}"></div>
+    </div>
+  </div>
+  <p class="note">${t("cy_disc")}</p>
+  <p class="note">${t("local_note")}</p>`;
+}
+function summaryText(){
+  const L=[fmt(t("sum_head"),{n:S.name||"CORE"})];
+  for(let i=6;i>=0;i--){const d=new Date(); d.setDate(d.getDate()-i); const l=S.log[dkey(d)]; if(!l) continue;
+    const q=v=>v?t("q5")[v-1]:"–";
+    L.push(`${fmtDay(d)}: ${t("sleep")} ${l.sleepH??"–"} ${t("hours")} (${q(l.sleepQ)}) · ${t("food")} ${q(l.food)} · ${t("water")} ${l.water??0}×250ml · ${t("energy")} ${q(l.energy)}${l.note?" · "+l.note:""}`);}
+  if(L.length===1) L.push(t("sum_none"));
+  const ci=cycleInfo(new Date()); if(ci) L.push(fmt(t("sum_cycle"),{d:ci.day,p:t("phases")[ci.phase]}));
+  if(S.favs.length) L.push(t("lk_fav")+": "+S.favs.map(exName).join(", "));
+  if(S.diss.length) L.push(t("lk_dis")+": "+S.diss.map(exName).join(", "));
+  L.push(t("wk_title")+": "+t("dows").map((d,i)=>d.slice(0,2)+" "+S.micro[i]).join(", "));
+  L.push(t("st_sessions")+": "+totalDone());
+  return L.join("\n");
+}
+
+/* ---- exercise info sheet (opens in place) ---- */
+let SHEET_V=null;
+function openExInfo(id){
+  if(!EX[id]) return; closeExInfo();
+  const e=EX[id], el=document.createElement("div"); el.className="sheet-ov"; el.id="exSheet";
+  el.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="${esc(exName(id))}">
+    <div class="rowline"><h3>${esc(exName(id))}</h3><button type="button" class="rbtn sm" data-act="sheetClose" aria-label="${t("close")}">✕</button></div>
+    <div class="viewer"><canvas id="sheetCanvas" role="img" aria-label="${esc(exName(id))}"></canvas>
+      <div class="vctrl"><button type="button" data-vmode="ok" aria-pressed="true">${t("v_ok")}</button><button type="button" data-vmode="err" aria-pressed="false">${t("v_err")}</button></div></div>
+    <div class="tips">
+      <div class="good"><h4>${t("how")}</h4><ul>${e.tech[S.lang].map(x=>`<li>${x}</li>`).join("")}</ul></div>
+      <div class="bad"><h4>${t("avoid")}</h4><ul>${e.err[S.lang].map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    </div>
+    <div class="ex-foot">${likeBtns(id)}</div>
+  </div>`;
+  document.body.appendChild(el); document.body.classList.add("noscroll");
+  const c=document.getElementById("sheetCanvas");
+  SHEET_V={canvas:c,id,mode:"ok",playing:!RM,visible:true,t:0,last:0}; c._v=SHEET_V;
+  VIEWERS.push(SHEET_V); readColors(); drawViewer(SHEET_V,performance.now());
+  if(!rafOn){rafOn=true; requestAnimationFrame(loop);}
+  el.addEventListener("click",ev=>{if(ev.target===el) closeExInfo();});
+  setTimeout(()=>{const b=el.querySelector('[data-act="sheetClose"]'); b&&b.focus();},50);
+}
+function closeExInfo(){
+  const el=document.getElementById("exSheet"); if(!el) return;
+  if(SHEET_V){VIEWERS=VIEWERS.filter(v=>v!==SHEET_V); SHEET_V=null;}
+  el.remove(); if(!REEL.open) document.body.classList.remove("noscroll");
+}
+
+/* ---- events ---- */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.exinfo){openExInfo(b.dataset.exinfo); return;}
+  const act=b.dataset.act;
+  if(act==="sheetClose") closeExInfo();
+  if(act==="logoHome"){closeExInfo(); if(REEL.open) closeReel(); if(S.level!==null&&S.goal) go("home"); else {GATE="welcome"; render(); window.scrollTo(0,0);}}
+  if(act==="cyAdd"){const last=S.cycle.last?parseD(S.cycle.last):new Date(); last.setDate(last.getDate()-cycleLen()); S.cycle.hist.push(dkey(last)); syncCycle(); render();}
+  if(b.dataset.cydel){S.cycle.hist=S.cycle.hist.filter(d=>d!==b.dataset.cydel); syncCycle(); render();}
+});
+document.addEventListener("change",e=>{
+  const el=e.target; if(el.dataset.cyh===undefined) return;
+  const old=el.dataset.cyh, nv=el.value;
+  if(nv&&nv>dkey(new Date())){el.value=old; return;}
+  S.cycle.hist=S.cycle.hist.filter(d=>d!==old); if(nv) S.cycle.hist.push(nv); syncCycle(); render();
+});
+document.addEventListener("keydown",e=>{if(e.key==="Escape") closeExInfo();});
+
+
+/* ---- share progress straight to Instagram (system share sheet) ---- */
+Object.assign(T.es,{share_btn:"Compartir en Instagram",share_hint:"Se abrirá el menú de compartir del móvil: elige Instagram → Historia y etiqueta a {h}.",share_fb:"Tu navegador no deja compartir directamente. Mantén pulsada la imagen para guardarla y súbela a Instagram.",share_ig:"Abrir Instagram"});
+Object.assign(T.en,{share_btn:"Share to Instagram",share_hint:"Your phone's share menu will open: choose Instagram → Story and tag {h}.",share_fb:"Your browser can't share directly. Press and hold the image to save it, then post it on Instagram.",share_ig:"Open Instagram"});
+Object.assign(T.ru,{share_btn:"Поделиться в Instagram",share_hint:"Откроется меню «Поделиться»: выберите Instagram → История и отметьте {h}.",share_fb:"Браузер не позволяет поделиться напрямую. Нажмите и удерживайте картинку, чтобы сохранить, и выложите в Instagram.",share_ig:"Открыть Instagram"});
+let STORY={url:null,file:null,busy:null,key:""};
+function storyKey(){return [totalDone(),S.lang,S.country,(S.favs||[]).join(),Object.keys(S.hist).length].join("|");}
+function prepStory(){
+  const k=storyKey(); if(STORY.key===k&&(STORY.file||STORY.busy)) return STORY.busy||Promise.resolve();
+  STORY.key=k; STORY.file=null;
+  STORY.busy=makeStory().then(async url=>{STORY.url=url;
+    try{const blob=await (await fetch(url)).blob(); STORY.file=new File([blob],"core-club-story.jpg",{type:"image/jpeg"});}catch(e){STORY.file=null;}
+    STORY.busy=null;}).catch(()=>{STORY.busy=null;});
+  return STORY.busy;
+}
+async function shareStory(btn){
+  const out=document.getElementById("shareOut"), h=HANDLES[S.country]||HANDLES.ve;
+  if(!STORY.file){btn.disabled=true; await prepStory(); btn.disabled=false;}
+  const f=STORY.file;
+  if(f&&navigator.canShare&&navigator.canShare({files:[f]})){
+    try{await navigator.share({files:[f],title:"CORE Club",text:h}); return;}
+    catch(e){ if(e&&e.name==="AbortError") return; }
+  }
+  if(out&&STORY.url) out.innerHTML=`<img class="story" src="${STORY.url}" alt="${t("share_t")}"><p class="small muted">${t("share_fb")}</p><a class="btn ghost sm" href="https://instagram.com/${h.slice(1)}">${t("share_ig")}</a>`;
+}
+
+
+/* =========================================================
    ADMIN PANEL (owner only · Spanish)
    ========================================================= */
 const ADM={ready:false,docs:[],err:"",filter:"all",q:"",last:null,armed:null,busy:false,tool:"",toolOut:""};
@@ -3273,6 +3452,7 @@ function render(){
   if(S.view==="admin") renderAdminData();
   initViewers();
   initSpins();
+  if(S.view==="progress") setTimeout(prepStory,300);
   updateRest();
 }
 function go(view){S.view=view; resetArmed=false; PLAN_PICK=""; save(); render(); window.scrollTo(0,0);}
@@ -3336,8 +3516,8 @@ document.addEventListener("click",async e=>{
   }
   if(b.dataset.like){
     const f=b.dataset.like, id=b.dataset.id;
-    S[f]=S[f]===id?"":id; if(f==="fav"&&S.dis===id) S.dis=""; if(f==="dis"&&S.fav===id) S.fav="";
-    save(); document.querySelectorAll("[data-like]").forEach(x=>x.setAttribute("aria-pressed",S[x.dataset.like]===x.dataset.id));
+    toggleLike(f,id);
+    document.querySelectorAll("[data-like]").forEach(x=>x.setAttribute("aria-pressed",isLiked(x.dataset.like,x.dataset.id)));
     if(S.view==="diary") render(); return;
   }
   if(b.dataset.ob){
@@ -3425,7 +3605,7 @@ document.addEventListener("click",async e=>{
   if(act==="clearLast"){ADM.last=null; renderAdminData();}
   if(act==="chStart"){S.ch={start:dkey(new Date()),done:{},t1:"",t30:"",prize:""}; save(); render();}
   if(act==="chReset"){if(!resetArmed){resetArmed=true; render(); return;} resetArmed=false; S.ch=null; save(); render();}
-  if(act==="share"){const out=document.getElementById("shareOut"); b.disabled=true; try{const url=await makeStory(); out.innerHTML=`<img class="story" src="${url}" alt="${t("share_t")}">`;}catch(err){toast(t("copy_fail"));} b.disabled=false;}
+  if(act==="share") shareStory(b);
   if(act==="reelClose") closeReel();
   if(act==="reelPause"){REEL.paused=!REEL.paused; buildReel();}
   if(act==="reelNext"){
@@ -3548,7 +3728,7 @@ window.addEventListener("hashchange",()=>{readHash(); render();});
   }
 })();
 
-document.getElementById("barLogo").innerHTML=logoBlock("bar");
+document.getElementById("barLogo").innerHTML=logoBlock("bar"); document.getElementById("barLogo").setAttribute("aria-label",t("home_lbl"));
 </script>
 </body>
 </html>
