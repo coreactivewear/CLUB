@@ -45,7 +45,7 @@ button{cursor:pointer}
 .lockup .aw{font-family:var(--font-label);font-weight:700;letter-spacing:.32em;margin-right:-.32em;color:var(--ink)}
 .lockup.bar{width:74px}.lockup.bar .aw{font-size:5.6px;margin-top:2px}
 .lockup.cover{width:168px}.lockup.cover .aw{font-size:12px;margin-top:6px}
-.lockup.reel{width:70px}.lockup.reel .aw{font-size:5.2px;margin-top:2px}
+.lockup.reellogo{width:70px}.lockup.reellogo .aw{font-size:5.2px;margin-top:2px}
 .lockup.splogo{width:190px;animation:spIn .9s ease both}.lockup.splogo .aw{font-size:13.5px;margin-top:7px}
 .slogan-txt{font-family:var(--font-display);font-variation-settings:"SOFT" 100;font-weight:900;font-size:22px;line-height:1.02;text-align:center;margin:0;color:var(--ink)}
 .slogan-txt.sm{font-size:18px}
@@ -150,6 +150,27 @@ p{margin:0}
 .swatches{display:flex;gap:4px}
 .swatches i,.sw i{display:block;width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,.1)}
 .shopstrip{background:var(--soft);border-color:transparent}
+.best-btn{display:flex;align-items:center;gap:10px;width:100%;border:0;border-radius:14px;background:var(--ink);color:var(--bg);padding:12px 14px;text-align:left}
+.best-btn span{font-family:var(--font-label);font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:#E9D9C3}
+.best-btn small{flex:1;font-size:14px}
+.best-btn b{font-size:20px;line-height:1}
+.chip.best{border:0;background:var(--ink);color:#E9D9C3;cursor:pointer}
+.product{position:relative}
+.ribbon{position:absolute;top:22px;left:22px;z-index:2;background:var(--ink);color:#E9D9C3;font-family:var(--font-label);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border-radius:999px}
+.gallery{display:flex;flex-direction:column;gap:8px}
+.g-stage{position:relative;border-radius:14px;background:var(--stage);overflow:hidden;height:250px}
+.gallery.big .g-stage{height:340px}
+.g-stage canvas,.g-stage img{width:100%;height:100%;display:block;object-fit:cover}
+.g-stage canvas[data-spin]{cursor:grab;touch-action:pan-y}
+.g-stage canvas[data-spin]:active{cursor:grabbing}
+.g-tag{position:absolute;right:12px;top:12px;background:rgba(251,248,243,.9);border-radius:999px;padding:4px 10px;font-family:var(--font-label);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.g-hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:12px;color:var(--muted);pointer-events:none}
+.g-arrow{position:absolute;top:50%;transform:translateY(-50%);width:38px;height:38px;border-radius:50%;border:0;background:rgba(255,255,255,.92);box-shadow:0 2px 10px rgba(0,0,0,.12);font-size:22px;line-height:1;color:var(--ink)}
+.g-arrow.l{left:10px}.g-arrow.r{right:10px}
+.g-dots{display:flex;justify-content:center;gap:6px}
+.g-dots button{width:7px;height:7px;border-radius:50%;border:0;padding:0;background:var(--line)}
+.g-dots button.on{background:var(--ink);width:18px;border-radius:4px}
+.price{font-family:var(--font-display);font-size:30px;font-weight:900}
 .swrow{display:flex;gap:8px;flex-wrap:wrap}
 .sw{display:flex;gap:2px;padding:4px;border-radius:999px;border:1.5px solid transparent;background:var(--surface)}
 .sw.on{border-color:var(--ink)}
@@ -2555,7 +2576,7 @@ function buildReel(){
   const step=REEL.seq?REEL.seq[REEL.si]:null;
   el.innerHTML=`<div class="reel-in">
     <div class="segs">${Array.from({length:segs},(_,i)=>`<span class="${i<curSeg?"on":i===curSeg?"cur":""}"><i id="${i===curSeg?"segFill":""}"></i></span>`).join("")}</div>
-    <div class="reel-top">${logoBlock("reel")}<button type="button" class="rbtn" data-act="reelClose" aria-label="${t("close")}">✕</button></div>
+    <div class="reel-top">${logoBlock("reellogo")}<button type="button" class="rbtn" data-act="reelClose" aria-label="${t("close")}">✕</button></div>
     <canvas id="reelCanvas" role="img" aria-label="${esc(exName(id))}"></canvas>
     <div class="reel-info">
       ${REEL.done?`<h2>${t("finished_abs")}</h2>${sloganHTML("sm")}`:`
@@ -2665,6 +2686,7 @@ function vShop(){
 function shopStrip(){
   return `<div class="card shopstrip"><div class="rowline"><div><span class="eyebrow">${t("shop_strip")}</span><h3>${esc(productById(S.outfit).name[S.lang])}</h3></div>
     <button type="button" class="btn sm" data-nav="shop">${t("shop_see")}</button></div>
+    <button type="button" class="best-btn" data-product="${CONFIG.shop.bestseller}"><span>${t("best_btn")}</span><small>${esc(productById(CONFIG.shop.bestseller).name[S.lang])}</small><b>›</b></button>
     <div class="swrow">${CONFIG.shop.products.map(p=>`<button type="button" class="sw ${productById(S.outfit).id===p.id?"on":""}" data-outfit-set="${p.id}" aria-label="${esc(p.name[S.lang])}"><i style="background:${p.top}"></i><i style="background:${p.leg}"></i></button>`).join("")}</div></div>`;
 }
 function vMobility(){
@@ -2695,6 +2717,167 @@ function showSplash(){
 document.addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b) return;
   if(b.dataset.outfitSet){S.outfit=b.dataset.outfitSet; save(); render();}
+});
+
+
+/* =========================================================
+   SHOP v2: bestseller, product detail, gallery (video ↔ 360° ↔ photos)
+   ========================================================= */
+Object.assign(CONFIG.shop,{bestseller:"negro"});
+const PRODUCT_INFO={
+  desc:{es:"Top de sujeción media con espalda nadadora y leggings de tiro alto que no transparentan. Pensado para gimnasio, pilates y tu día a día.",
+        en:"Medium-support top with a racerback and squat-proof high-waisted leggings. Made for the gym, Pilates and every day.",
+        ru:"Топ средней поддержки со спиной-борцовкой и непрозрачные леггинсы с высокой посадкой. Для зала, пилатеса и каждого дня."},
+  feat:{es:["Tejido suave de secado rápido","Tiro alto que estiliza y sujeta","Sin costura delantera","Sujeción media"],
+        en:["Soft, quick-dry fabric","High waist that sculpts and holds","No front seam","Medium support"],
+        ru:["Мягкая быстросохнущая ткань","Высокая посадка, которая моделирует фигуру","Без переднего шва","Средняя поддержка"]},
+  fabric:{es:"Poliamida y elastano",en:"Polyamide and elastane",ru:"Полиамид и эластан"},
+  sizes:["XS","S","M","L"]
+};
+CONFIG.shop.products.forEach(p=>{ if(!p.info) p.info=PRODUCT_INFO; if(!p.photos) p.photos=[]; });
+Object.assign(T.es,{best_btn:"★ Bestseller",best_t:"El más vendido",best_sub:"El set favorito de las core girls.",see_detail:"Ver detalles",sizes:"Tallas",fabric:"Tejido",details:"Detalles",
+  g_anim:"En movimiento",g_360:"360°",g_photo:"Foto",g_drag:"Arrastra para girar el set",next_slide:"Siguiente vista",prev_slide:"Vista anterior",colors:"Colores"});
+Object.assign(T.en,{best_btn:"★ Bestseller",best_t:"Bestseller",best_sub:"The core girls' favourite set.",see_detail:"See details",sizes:"Sizes",fabric:"Fabric",details:"Details",
+  g_anim:"In motion",g_360:"360°",g_photo:"Photo",g_drag:"Drag to rotate the set",next_slide:"Next view",prev_slide:"Previous view",colors:"Colours"});
+Object.assign(T.ru,{best_btn:"★ Хит продаж",best_t:"Хит продаж",best_sub:"Любимый комплект core girls.",see_detail:"Подробнее",sizes:"Размеры",fabric:"Ткань",details:"Детали",
+  g_anim:"В движении",g_360:"360°",g_photo:"Фото",g_drag:"Потяните, чтобы повернуть комплект",next_slide:"Следующий вид",prev_slide:"Предыдущий вид",colors:"Цвета"});
+
+const GAL={}; // product id → slide index
+function slidesOf(p){return [{k:"anim"},{k:"spin"},...(p.photos||[]).map(src=>({k:"img",src}))];}
+function gallery(p,big){
+  const sl=slidesOf(p), i=Math.min(GAL[p.id]||0,sl.length-1), cur=sl[i];
+  const label=cur.k==="anim"?t("g_anim"):cur.k==="spin"?t("g_360"):t("g_photo");
+  const stage=cur.k==="anim"?`<canvas data-anim="air_squat" data-outfit="${p.id}" role="img" aria-label="${esc(p.name[S.lang])}"></canvas>`
+    :cur.k==="spin"?`<canvas data-spin="${p.id}" role="img" aria-label="${t("g_drag")}"></canvas><span class="g-hint">↔ ${t("g_drag")}</span>`
+    :`<img src="${esc(cur.src)}" alt="${esc(p.name[S.lang])}">`;
+  return `<div class="gallery ${big?"big":""}"><div class="g-stage">${stage}
+      <span class="g-tag">${label}</span>
+      <button type="button" class="g-arrow l" data-gal="${p.id}" data-dir="-1" aria-label="${t("prev_slide")}">‹</button>
+      <button type="button" class="g-arrow r" data-gal="${p.id}" data-dir="1" aria-label="${t("next_slide")}">›</button></div>
+    <div class="g-dots">${sl.map((s,j)=>`<button type="button" class="${j===i?"on":""}" data-gal="${p.id}" data-go="${j}" aria-label="${s.k==="anim"?t("g_anim"):s.k==="spin"?t("g_360"):t("g_photo")}"></button>`).join("")}</div></div>`;
+}
+function vShop(){
+  const cur=(productById(S.outfit)||{}).id, c=S.country||"kz", best=CONFIG.shop.bestseller;
+  return `<button type="button" class="back" data-act="back">${t("back")}</button>
+  <div class="hero"><span class="eyebrow">core. activewear</span><h1>${t("shop_t")}</h1><p class="muted">${t("shop_sub")}</p>
+    <div class="chips"><button type="button" class="chip best" data-product="${best}">${t("best_btn")}</button></div></div>
+  ${CONFIG.shop.products.map(p=>`<div class="card product">
+    ${p.id===best?`<span class="ribbon">${t("best_btn")}</span>`:""}
+    ${gallery(p)}
+    <div class="rowline"><div><h3>${esc(p.name[S.lang])}</h3>${p.price&&p.price[c]?`<p class="price-sm">${esc(p.price[c])}</p>`:""}</div>
+      <span class="swatches"><i style="background:${p.top}"></i><i style="background:${p.leg}"></i></span></div>
+    <div class="inline"><button type="button" class="btn ${cur===p.id?"":"ghost"} sm" data-outfit-set="${p.id}">${cur===p.id?"✓ "+t("shop_wearing"):t("shop_wear")}</button>
+      <button type="button" class="btn ghost sm" data-product="${p.id}">${t("see_detail")}</button></div>
+  </div>`).join("")}`;
+}
+let PID=null;
+function vProduct(){
+  const p=productById(PID||CONFIG.shop.bestseller), c=S.country||"kz", info=p.info, isBest=p.id===CONFIG.shop.bestseller;
+  return `<button type="button" class="back" data-act="backShop">${t("back")}</button>
+  ${isBest?`<div class="hero"><span class="eyebrow">${t("best_btn")}</span><h1>${t("best_t")}</h1><p class="muted">${t("best_sub")}</p></div>`:""}
+  <div class="card product">
+    ${gallery(p,true)}
+    <div class="rowline"><h2>${esc(p.name[S.lang])}</h2>${isBest?`<span class="chip dark">${t("best_btn")}</span>`:""}</div>
+    ${p.price&&p.price[c]?`<p class="price">${esc(p.price[c])}</p>`:""}
+    <p class="small">${esc(info.desc[S.lang])}</p>
+    <div class="field"><span class="qlabel">${t("colors")}</span><div class="swrow">${CONFIG.shop.products.map(q=>`<button type="button" class="sw ${q.id===p.id?"on":""}" data-product="${q.id}" aria-label="${esc(q.name[S.lang])}"><i style="background:${q.top}"></i><i style="background:${q.leg}"></i></button>`).join("")}</div></div>
+    <div class="field"><span class="qlabel">${t("sizes")}</span><div class="chips">${info.sizes.map(s=>`<span class="chip plain">${s}</span>`).join("")}</div></div>
+    <div class="field"><span class="qlabel">${t("details")}</span><ul class="list small">${info.feat[S.lang].map(x=>`<li>${esc(x)}</li>`).join("")}<li>${t("fabric")}: ${esc(info.fabric[S.lang])}</li></ul></div>
+    <div class="inline"><button type="button" class="btn ${(productById(S.outfit)||{}).id===p.id?"":"ghost"} sm" data-outfit-set="${p.id}">${(productById(S.outfit)||{}).id===p.id?"✓ "+t("shop_wearing"):t("shop_wear")}</button>${shopLinks(p)}</div>
+  </div>`;
+}
+
+/* ---- 360° ghost-mannequin turntable (until real photos arrive) ---- */
+let SPINS=[], spinRaf=false;
+function initSpins(){
+  SPINS=[...document.querySelectorAll("canvas[data-spin]")].map(c=>{
+    const s={c,pid:c.dataset.spin,th:-0.5,drag:null,last:performance.now(),vel:0};
+    c.addEventListener("pointerdown",e=>{s.drag=e.clientX; s.vel=0; c.setPointerCapture(e.pointerId);});
+    c.addEventListener("pointermove",e=>{if(s.drag==null) return; const dx=e.clientX-s.drag; s.drag=e.clientX; s.th+=dx*0.012; s.vel=dx*0.012;});
+    const up=()=>{s.drag=null;}; c.addEventListener("pointerup",up); c.addEventListener("pointercancel",up);
+    return s;});
+  if(SPINS.length&&!spinRaf){spinRaf=true; requestAnimationFrame(spinLoop);}
+}
+function spinLoop(now){
+  SPINS=SPINS.filter(s=>document.body.contains(s.c));
+  if(!SPINS.length){spinRaf=false; return;}
+  SPINS.forEach(s=>{const dt=Math.min(.05,(now-s.last)/1000); s.last=now;
+    if(s.drag==null){ if(Math.abs(s.vel)>.002){s.th+=s.vel; s.vel*=.92;} else if(!RM) s.th+=dt*0.55; }
+    drawGarment(s.c,s.th,productById(s.pid));});
+  requestAnimationFrame(spinLoop);
+}
+function drawGarment(c,th,p){
+  const dpr=Math.min(2,window.devicePixelRatio||1), W=c.clientWidth, H=c.clientHeight; if(!W||!H) return;
+  if(c.width!==Math.round(W*dpr)||c.height!==Math.round(H*dpr)){c.width=Math.round(W*dpr); c.height=Math.round(H*dpr);}
+  const x=c.getContext("2d"); x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,W,H);
+  const B=Math.min(W*0.9,H*0.62), cx=W/2, y0=H*0.06, Y=f=>y0+f*H*0.86;
+  const co=Math.cos(th), si=Math.sin(th), front=co>0;
+  const O=outfit(p.id);
+  // display stand
+  const sg=x.createRadialGradient(cx,Y(1.02),2,cx,Y(1.02),B*.55); sg.addColorStop(0,"rgba(60,45,35,.18)"); sg.addColorStop(1,"rgba(60,45,35,0)");
+  x.save(); x.translate(cx,Y(1.02)); x.scale(1,.16); x.fillStyle=sg; x.beginPath(); x.arc(0,0,B*.55,0,Math.PI*2); x.fill(); x.restore();
+  x.fillStyle="#E7DCCD"; x.beginPath(); x.ellipse(cx,Y(1.0),B*.36,B*.05,0,0,Math.PI*2); x.fill();
+  x.fillStyle="#D6C7B5"; x.fillRect(cx-B*.36,Y(1.0),B*.72,B*.03); x.beginPath(); x.ellipse(cx,Y(1.0)+B*.03,B*.36,B*.05,0,0,Math.PI); x.fill();
+  x.fillStyle="#BFAE98"; x.fillRect(cx-B*.008,Y(.955),B*.016,Y(1.0)-Y(.955));
+  // projected half-width of an elliptical cross-section (a = lateral, b = depth) and depth shift
+  const hw=(a,b)=>Math.sqrt((a*co)**2+(b*si)**2);
+  const shade=(col,xl,xr,y0,y1)=>{const g=x.createLinearGradient(xl,0,xr,0); const L=front?.18:.05, R=front?-.16:-.22;
+    g.addColorStop(0,tint(col,L+si*.06)); g.addColorStop(.5,col); g.addColorStop(1,tint(col,R-si*.06)); return g;};
+  // body section profile: [y, lateral a, depth front, depth back]
+  const prof=(rows)=>rows.map(([f,a,df,db])=>{const b=(df+db)/2, sh=(db-df)/2*si*B; return {y:Y(f),w:hw(a*B,b*B),c:cx-sh};});
+  const shapePath=(P)=>{x.beginPath(); P.forEach((r,i)=>{i?x.lineTo(r.c+r.w,r.y):x.moveTo(r.c+r.w,r.y);});
+    for(let i=P.length-1;i>=0;i--) x.lineTo(P[i].c-P[i].w,P[i].y); x.closePath();};
+  const smoothShape=(P)=>{const pts=[...P.map(r=>[r.c+r.w,r.y]),...P.slice().reverse().map(r=>[r.c-r.w,r.y])]; smoothClosed(x,pts);};
+  // ---- leggings: one gradient for every piece so they read as one garment ----
+  const legShade=c0=>shade(c0,cx-B*.17,cx+B*.17);
+  const hips=prof([[.43,.116,.084,.088],[.47,.124,.088,.098],[.53,.136,.092,.118],[.585,.132,.088,.112],[.6,.118,.08,.1],[.615,.07,.05,.06]]);
+  smoothShape(hips); x.fillStyle=legShade(O.leg); x.fill();
+  const legRows=[[0,.07,.07,.078],[.17,.061,.062,.07],[.33,.04,.045,.05],[.5,.046,.05,.058],[.72,.027,.03,.032]];
+  const legY0=.575, legLen=.38;
+  const legs=[-1,1].map(sd=>{const X=sd*.066*B; return {sd,off:X*co,z:-X*si};}).sort((a,b)=>a.z-b.z);
+  legs.forEach(L=>{
+    const P=legRows.map(([f,a,df,db])=>{const bb=(df+db)/2, sh=(db-df)/2*si*B; return {y:Y(legY0+f*legLen/.72),w:hw(a*B,bb*B),c:cx+L.off-sh};});
+    smoothShape(P); x.fillStyle=legShade(L.z<0&&Math.abs(si)>.3?tint(O.leg,O.light?-.07:-.05):O.leg); x.fill();
+    // inner-leg crease
+    x.strokeStyle=tint(O.leg,O.light?-.2:-.25); x.globalAlpha=.25; x.lineWidth=1; x.beginPath(); x.moveTo(P[0].c-L.sd*P[0].w*.55,P[0].y+4); x.lineTo(P[2].c-L.sd*P[2].w*.4,P[2].y); x.stroke(); x.globalAlpha=1;
+  });
+  // waistband
+  const wb=prof([[.43,.116,.084,.088],[.466,.123,.088,.096]]);
+  smoothShape(wb); x.fillStyle=legShade(tint(O.leg,O.light?-.05:.07)); x.fill();
+  // center seam (front when facing, back otherwise)
+  x.strokeStyle=tint(O.leg,O.light?-.2:.18); x.lineWidth=1; x.globalAlpha=.5; x.beginPath();
+  const sx=f=>cx+(front?1:-1)*f*B*si;
+  x.moveTo(sx(front?.088:.098),Y(.466)); x.quadraticCurveTo(sx(front?.092:.118),Y(.53),sx(front?.05:.06),Y(.6)); x.stroke(); x.globalAlpha=1;
+  // logo on waistband
+  if(co>.2){x.save(); x.translate(cx+.086*B*si,Y(.448)); x.scale(Math.max(.15,co),1); x.fillStyle=O.light?"rgba(30,27,25,.75)":"rgba(251,248,243,.85)";
+    x.font=`800 ${B*.048}px Fraunces, Georgia, serif`; x.textAlign="center"; x.textBaseline="middle"; x.fillText("core.",0,0); x.restore();}
+  // ---- straps: loops over invisible shoulders (back half first) ----
+  const proj=(X,Z,f)=>[cx+X*B*co+Z*B*si, Y(f), -X*si+Z*co];
+  const strap=(sd)=>[proj(sd*.07,.07,.215),proj(sd*.088,0,.128),proj(sd*.03,-.075,.205)];
+  const drawStrap=(pts,back)=>{x.strokeStyle=back?tint(O.top,O.light?-.18:-.3):O.top; x.lineWidth=B*.024; x.lineCap="round"; x.beginPath();
+    x.moveTo(pts[0][0],pts[0][1]); x.quadraticCurveTo(pts[1][0]*2-(pts[0][0]+pts[2][0])/2,pts[1][1]*2-(pts[0][1]+pts[2][1])/2,pts[2][0],pts[2][1]); x.stroke();};
+  [-1,1].forEach(sd=>drawStrap(strap(sd),true));
+  // ---- crop top ----
+  const top=prof([[.2,.1,.072,.078],[.235,.128,.098,.084],[.28,.141,.114,.086],[.32,.133,.094,.082],[.36,.124,.084,.08]]);
+  smoothShape(top); x.fillStyle=shade(O.top,cx-B*.15,cx+B*.15); x.fill();
+  const ub=prof([[.334,.13,.09,.082],[.36,.124,.084,.08]]); smoothShape(ub); x.fillStyle=tint(O.top,O.light?-.07:.09); x.fill();
+  if(front){ x.fillStyle=tint(O.top,O.light?-.22:-.35); x.beginPath(); x.ellipse(cx+.07*B*si,Y(.204),Math.max(2,.06*B*Math.abs(co)),B*.018,0,0,Math.PI); x.fill(); }
+  else { x.fillStyle=tint(O.top,O.light?-.12:-.28); x.beginPath(); x.moveTo(cx-.075*B*si-.045*B*co,Y(.2)); x.quadraticCurveTo(cx-.085*B*si,Y(.25),cx-.075*B*si+.045*B*co,Y(.2)); x.closePath(); x.fill(); }
+  // front straps over the top edge
+  [-1,1].forEach(sd=>{const pts=strap(sd); if(front) drawStrap(pts,false);});
+  // soft highlight sweep
+  const hl=x.createLinearGradient(cx-B*.2,0,cx+B*.2,0); const k=(Math.sin(th)+1)/2;
+  hl.addColorStop(Math.max(0,k-.15),"rgba(255,255,255,0)"); hl.addColorStop(k,"rgba(255,255,255,.10)"); hl.addColorStop(Math.min(1,k+.15),"rgba(255,255,255,0)");
+  x.fillStyle=hl; smoothShape(top); x.fill(); smoothShape(hips); x.fill();
+}
+
+/* events */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.gal){const pid=b.dataset.gal, n=slidesOf(productById(pid)).length;
+    GAL[pid]=b.dataset.go!=null?+b.dataset.go:((GAL[pid]||0)+(+b.dataset.dir)+n)%n; render(); return;}
+  if(b.dataset.product){PID=b.dataset.product; go("product"); return;}
+  if(b.dataset.act==="backShop"){go("shop");}
 });
 
 /* =========================================================
@@ -3082,13 +3265,14 @@ function render(){
     nav.hidden=false;
     if(S.view==="session"&&!S.session) S.view="home";
     if(S.view==="progress"&&!PH.ready&&!PH.loading){PH.loading=true; phLoad().then(()=>{if(S.view==="progress") render();});}
-    html=({home:vHome,session:vSession,progress:vProgress,profile:vProfile,diary:vDiary,abs:vAbs,challenge:vChallenge,plans:vPlans,mobility:vMobility,shop:vShop}[S.view]||vHome)();
+    html=({home:vHome,session:vSession,progress:vProgress,profile:vProfile,diary:vDiary,abs:vAbs,challenge:vChallenge,plans:vPlans,mobility:vMobility,shop:vShop,product:vProduct}[S.view]||vHome)();
   }
-  const cur={session:"home",abs:"home",challenge:"home",plans:"home",mobility:"home",shop:"home"}[S.view]||S.view;
+  const cur={session:"home",abs:"home",challenge:"home",plans:"home",mobility:"home",shop:"home",product:"home"}[S.view]||S.view;
   nav.querySelectorAll("[data-nav]").forEach(b=>b.dataset.nav===cur?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
   v.innerHTML=html;
   if(S.view==="admin") renderAdminData();
   initViewers();
+  initSpins();
   updateRest();
 }
 function go(view){S.view=view; resetArmed=false; PLAN_PICK=""; save(); render(); window.scrollTo(0,0);}
