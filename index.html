@@ -386,6 +386,35 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .msgbox{background:var(--bg);border:1px dashed var(--line);border-radius:10px;padding:12px;font-size:14px;white-space:pre-wrap}
 .flag{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* v3 */
+.opt.multi{position:relative;padding-right:28px}
+.opt.multi::after{content:"";position:absolute;top:10px;right:10px;width:14px;height:14px;border-radius:5px;border:1.5px solid var(--line);background:var(--surface)}
+.opt.multi[aria-pressed="true"]::after{content:"✓";border-color:var(--ink);background:var(--ink);color:var(--accent-ink);font-size:10px;line-height:13px;text-align:center;font-weight:700}
+.opts.two>.opt:last-child:nth-child(odd),.goal-grid>.goal-card:last-child:nth-child(odd){grid-column:1/-1}
+.opts.two.tall>.opt.multi:last-child:nth-child(odd){text-align:left}
+.musmap{display:flex;gap:12px;align-items:center;margin-top:12px;padding:10px 12px;border-radius:14px;background:var(--stage)}
+.bfigs{display:flex;gap:4px;flex:none}
+.bfig{margin:0;text-align:center}
+.bfig svg{width:58px;height:123px;display:block}
+.bfig figcaption{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.bfig .silh>*{fill:var(--surface);stroke:var(--line);stroke-width:1}
+.bfig .m0>*{fill:var(--soft)}
+.bfig .m1>*{fill:var(--ink)}
+.bfig .m2>*{fill:var(--beige)}
+.mlist h4{margin:0 0 6px}
+.mlist p{margin:0 0 4px;line-height:1.35}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.dot.m1{background:var(--ink)} .dot.m2{background:var(--beige)}
+.chips.wrap{flex-wrap:wrap}
+.mweek{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;font-size:12px;color:var(--muted)}
+.mday{display:flex;flex-direction:column;gap:4px;align-items:center}
+.mdots{min-height:16px;display:flex;gap:2px;align-items:center}
+.mdots i{width:6px;height:6px;border-radius:50%;background:var(--taupe);display:block}
+.mdots i.ok{background:var(--ok);width:8px;height:8px}
+.omimg img{width:100%;border-radius:14px;display:block;max-height:460px;object-fit:cover}
+.cap::first-letter{text-transform:uppercase}
+.of-tile{background-image:radial-gradient(160px 100px at 105% 120%,rgba(205,187,166,.7),transparent 70%)}
 </style>
 </head>
 <body>
@@ -1241,7 +1270,7 @@ const APP_URL = (/claude\.(ai|site)|claudeusercontent/.test(location.hostname)||
 /* =========================================================
    PROGRAMS — by goal, two variants that alternate every block
    ========================================================= */
-const GOALS=["glute","tone","fat","zero"];
+const GOALS=["glute","tone","fat","zero","health"];
 const PLACES=["gym","home","bw"];
 const PROGRAMS={
  glute:[{A:["hip_thrust","goblet_squat","rdl","split_squat","band_abduction","dead_bug"],B:["db_row","pushup","shoulder_press","band_pull_apart","plank"],C:["step_up","reverse_lunge","hip_thrust","single_bridge","band_abduction","side_plank"]},
@@ -1250,11 +1279,13 @@ const PROGRAMS={
        {A:["goblet_squat","rdl","reverse_lunge","hip_thrust","band_abduction","side_plank"],B:["pushup","db_row","shoulder_press","biceps_curl","band_pull_apart","plank"],C:["thruster","step_up","split_squat","single_bridge","dead_bug","climbers"]}],
  fat:[{A:["goblet_squat","pushup","reverse_lunge","db_row","climbers","plank"],B:["thruster","step_up","rdl","shoulder_press","climbers","side_plank"],C:["thruster","reverse_lunge","pushup","single_bridge","climbers","dead_bug"]},
       {A:["thruster","split_squat","db_row","pushup","climbers","plank"],B:["goblet_squat","rdl","step_up","shoulder_press","climbers","dead_bug"],C:["reverse_lunge","thruster","hip_thrust","band_pull_apart","climbers","side_plank"]}],
+ health:[{A:["goblet_squat","db_row","hip_thrust","pushup","bird_dog"],B:["step_up","shoulder_press","rdl","band_pull_apart","side_plank","cat_cow"],C:["reverse_lunge","single_bridge","pushup","db_row","dead_bug","hip_flexor"]},
+         {A:["goblet_squat","pushup","rdl","db_row","plank"],B:["split_squat","hip_thrust","shoulder_press","band_pull_apart","bird_dog","cobra"],C:["step_up","glute_bridge","db_row","band_abduction","side_plank","ham_stretch"]}],
  zero:[{A:["goblet_squat","hip_thrust","pushup","db_row","dead_bug"],B:["step_up","rdl","shoulder_press","band_pull_apart","plank"],C:["reverse_lunge","single_bridge","pushup","band_abduction","side_plank"]},
        {A:["goblet_squat","rdl","pushup","db_row","plank"],B:["split_squat","hip_thrust","shoulder_press","biceps_curl","dead_bug"],C:["step_up","single_bridge","band_pull_apart","band_abduction","side_plank"]}]
 };
-const DAY_T={glute:{A:"lower1",B:"upper",C:"glute2"},tone:{A:"lower1",B:"upper",C:"full"},fat:{A:"circ1",B:"circ2",C:"metab"},zero:{A:"bas1",B:"bas2",C:"bas3"}};
-const MINUTES={glute:[35,40,45],tone:[35,40,45],fat:[30,35,40],zero:[25,30,35]};
+const DAY_T={glute:{A:"lower1",B:"upper",C:"glute2"},tone:{A:"lower1",B:"upper",C:"full"},fat:{A:"circ1",B:"circ2",C:"metab"},zero:{A:"bas1",B:"bas2",C:"bas3"},health:{A:"hl1",B:"hl2",C:"hl3"}};
+const MINUTES={glute:[35,40,45],tone:[35,40,45],fat:[30,35,40],zero:[25,30,35],health:[25,30,35]};
 const WEEK_DAYS = w => w === 4 ? ["A","B","T"] : ["A","B","C"];
 
 /* CORE abs zone */
@@ -1282,6 +1313,7 @@ function presc(type,L,w,goal,block){
   if(goal==="fat"){ if(p.reps) p.reps+=2; p.rest=type==="main"?45:30; }
   if(goal==="zero"){ if(w<4) p.sets=Math.max(2,p.sets-1); if(type==="main") p.rest=75; }
   if(goal==="glute"&&type==="main") p.rest=Math.max(p.rest,90);
+  if(goal==="health"){ if(p.sets) p.sets=Math.min(p.sets,3); if(p.reps) p.reps=Math.min(p.reps,12); if(type==="main") p.rest=75; }
   return p;
 }
 
@@ -1318,7 +1350,7 @@ function parseCode(raw){
   if(m && chk((m[1]==="CLUB"?"C":"M")+m[2]+m[3])===m[4]) return {type:m[1]==="CLUB"?"club":"prem",code:c,until:"20"+m[3].slice(0,2)+"-"+m[3].slice(2)};
   m=c.match(/^RETO-([A-Z2-9]{4})-([A-Z2-9]{3})$/);
   if(m && chk("R"+m[1])===m[2]) return {type:"reto",code:c};
-  m=c.match(/^PLAN-([0-3])([0-2])([0-2])([1-9])-([A-Z2-9]{4})-([A-Z2-9]{3})$/);
+  m=c.match(/^PLAN-([0-4])([0-2])([0-2])([1-9])-([A-Z2-9]{4})-([A-Z2-9]{3})$/);
   if(m && chk("A"+m[1]+m[2]+m[3]+m[4]+m[5])===m[6]) return {type:"plan",code:c,goal:GOALS[+m[1]],level:+m[2],place:PLACES[+m[3]],block:+m[4]};
   m=c.match(/^PREMIO-([A-Z2-9]{4})-([A-Z2-9]{3})$/);
   if(m && chk("P"+m[1])===m[2]) return {type:"prize",code:c};
@@ -1340,9 +1372,10 @@ const fresh=()=>({lang:"es",unlocked:false,code:"",name:"",contact:"",country:""
 let S=fresh();
 try{const raw=localStorage.getItem(KEY); if(raw) S=Object.assign(fresh(),JSON.parse(raw));}catch(e){}
 if(S.level!==null&&!S.goal) S.goal="tone";
+if(S.goal&&!Array.isArray(S.goals)) S.goals=S.goal==="mix"?["tone"]:[S.goal];
 if(S.place&&!PLACES.includes(S.place)) S.place="home";
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
-let OB={answers:[null,null,null],country:"",place:"",goal:""};
+let OB={answers:[null,null,null],country:"",place:"",goal:"",goals:[]};
 let resetArmed=false, OWNER=false, DB=null, GATE="welcome";
 
 const t=k=>{const L=T[S.lang]||T.ru; return L[k]!==undefined?L[k]:T.ru[k];};
@@ -1351,8 +1384,18 @@ const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&
 const placeIdx=()=>Math.max(0,PLACES.indexOf(S.place||"home"));
 const exName=id=>{const a=EX[id][S.lang]||EX[id].ru; return a[placeIdx()]||a[0];};
 const sk=(b,w,d)=>(b>1?"b"+b:"")+"w"+w+d;
-const dayList=(d,b)=>(PROGRAMS[S.goal||"tone"][((b||S.block)-1)%2][d])||[];
-const dayTitle=d=>d==="T"?t("dt").T:t("dt")[DAY_T[S.goal||"tone"][d]];
+/* Several goals: each day of the week comes from one of the chosen goals, rotating every block */
+function progKey(d,b){
+  const gs=(S.goals||[]).filter(g=>PROGRAMS[g]);
+  if(S.goal!=="mix"||gs.length<2) return PROGRAMS[S.goal]?S.goal:(gs[0]||"tone");
+  const i=Math.max(0,"ABC".indexOf(d==="T"?"A":d));
+  return gs[(i+((b||S.block)-1)*3)%gs.length];
+}
+const dayList=(d,b)=>(PROGRAMS[progKey(d,b)][((b||S.block)-1)%2][d])||[];
+const dayTitle=(d,b)=>d==="T"?t("dt").T:t("dt")[DAY_T[progKey(d,b)][d]];
+const dayMin=(d,b)=>MINUTES[progKey(d,b)][S.level==null?1:S.level];
+const goalLabel=gs=>(gs||S.goals||[S.goal]).filter(g=>GOALS.includes(g)).map(g=>t("goals")[GOALS.indexOf(g)]).join(" + ");
+function setGoals(gs){ gs=GOALS.filter(g=>gs.includes(g)); if(!gs.length) return; S.goals=gs; S.goal=gs.length>1?"mix":gs[0]; }
 const blockName=b=>t("blocks")[(b-1)%4]+(b>4?" "+(Math.floor((b-1)/4)+1):"");
 const doneCount=(b=S.block)=>{let n=0; for(let w=1;w<=4;w++) for(const d of WEEK_DAYS(w)) if(S.done[sk(b,w,d)]) n++; return n;};
 const totalDone=()=>Object.keys(S.done).filter(k=>S.done[k]).length;
@@ -2231,6 +2274,9 @@ function updateRest(){
    ========================================================= */
 const LOCK=`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`;
 const PLAY=`<svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>`;
+function multiGroup(name, labels, selGoals, cls="", descs){
+  return `<div class="opts ${cls}">${labels.map((l,i)=>`<button type="button" class="opt multi" data-ob="${name}" data-v="${i}" aria-pressed="${selGoals.includes(GOALS[i])}"><b>${l}</b>${descs?`<small>${descs[i]}</small>`:""}</button>`).join("")}</div>`;
+}
 function optGroup(name, labels, sel, cls="", descs){
   return `<div class="opts ${cls}">${labels.map((l,i)=>`<button type="button" class="opt" data-ob="${name}" data-v="${i}" aria-pressed="${sel===i}"><b>${l}</b>${descs?`<small>${descs[i]}</small>`:""}</button>`).join("")}</div>`;
 }
@@ -2260,23 +2306,25 @@ function vGate(){
   <label class="link center filebtn" style="align-self:center">${t("bk_restore")}<input type="file" accept=".json,application/json" id="bkFile" hidden></label>
   <footer class="cover-foot">${sloganHTML()}</footer>`;
 }
-function planPreview(goal,place,lvl){
-  if(goal==null||goal<0) return "";
-  const g=GOALS[goal], li=lvl==null?1:lvl;
-  const days=["A","B","C"].map(d=>`<li><b>${t("dt")[DAY_T[g][d]]}</b> · ${PROGRAMS[g][0][d].length} ${t("exs")}</li>`).join("");
+function planPreview(goals,place,lvl){
+  goals=GOALS.filter(g=>(goals||[]).includes(g)); if(!goals.length) return "";
+  const li=lvl==null?1:lvl, key=d=>goals["ABC".indexOf(d)%goals.length];
+  const days=["A","B","C"].map(d=>`<li><b>${t("dt")[DAY_T[key(d)][d]]}</b> · ${PROGRAMS[key(d)][0][d].length} ${t("exs")}</li>`).join("");
+  const mins=Math.round(goals.reduce((a,g)=>a+MINUTES[g][li],0)/goals.length/5)*5;
   return `<div class="card plan-card"><span class="eyebrow">${t("plan_prev")}</span>
-    <h3>${t("goals")[goal]}${place>=0?` · ${t("places")[place]}`:""}</h3>
-    <p class="small muted">${fmt(t("plan_meta"),{m:MINUTES[g][li]})}</p><ul class="list small">${days}</ul></div>`;
+    <h3>${goalLabel(goals)}${place>=0?` · ${t("places")[place]}`:""}</h3>
+    ${goals.length>1?`<p class="small">${t("goal_mix")}</p>`:""}
+    <p class="small muted">${fmt(t("plan_meta"),{m:mins})}</p><ul class="list small">${days}</ul></div>`;
 }
 function vOnboard(){
-  const cIdx=["ve","es","kz"].indexOf(OB.country), pIdx=PLACES.indexOf(OB.place), gIdx=GOALS.indexOf(OB.goal);
+  const cIdx=["ve","es","kz"].indexOf(OB.country), pIdx=PLACES.indexOf(OB.place);
   const lvl=OB.answers.includes(null)?null:(s=>s<=1?0:s<=4?1:2)(OB.answers.reduce((a,x)=>a+x,0));
   return `<div class="hero"><span class="eyebrow">${S.unlocked?t("tier_start"):t("trial_badge")}</span><h1>${t("ob_title")}</h1><p class="muted">${t("ob_sub")}</p></div>
   <div class="card">
-    <div class="field"><span class="qlabel">${t("goal_q")}</span>${optGroup("goal",t("goals"),gIdx,"two tall",t("goals_d"))}</div>
+    <div class="field"><span class="qlabel">${t("goal_q")}</span><p class="small muted" style="margin:-4px 0 8px">${t("goal_multi")}</p>${multiGroup("goal",t("goals"),OB.goals||[],"two tall",t("goals_d"))}</div>
     <div class="field"><span class="qlabel">${t("place")}</span>${optGroup("place",t("places"),pIdx,"tall",t("places_d"))}</div>
   </div>
-  ${planPreview(gIdx,pIdx,lvl)}
+  ${planPreview(OB.goals,pIdx,lvl)}
   <div class="card">
     <div class="field"><label for="obName">${t("name")}</label><input class="input" id="obName" value="${esc(S.name)}" autocomplete="given-name"></div>
     <div class="field"><label for="obContact">${t("contact")}</label><input class="input" id="obContact" value="${esc(S.contact)}" placeholder="${t("contact_ph")}"></div>
@@ -2297,7 +2345,7 @@ function sessionRow(b,w,d,nx){
   const count=d==="T"?3:dayList(d,b).length;
   return `<button type="button" class="session ${isDone?"done":""} ${isNext&&open?"next":""} ${open?"":"locked"}" data-open="${d}" data-w="${w}" data-b="${b}">
     <span class="day">${open?d:LOCK}</span>
-    <span class="info"><strong>${dayTitle(d)}</strong><span class="small muted">~${d==="T"?15:MINUTES[S.goal][S.level]} ${t("min")} · ${count} ${t("exs")}</span></span>
+    <span class="info"><strong>${dayTitle(d,b)}</strong><span class="small muted">~${d==="T"?15:dayMin(d,b)} ${t("min")} · ${count} ${t("exs")}</span></span>
     <span class="pill ${isDone?"ok":isNext&&open?"acc":""}">${!open?t("locked"):isDone?t("done"):t("pending")}</span></button>`;
 }
 function vHome(){
@@ -2311,7 +2359,7 @@ function vHome(){
   if(["A","B","C"].includes(mt)){
     const sf=sessionFor(mt), isDone=!!S.done[sk(sf.b,sf.w,sf.d)], open=canOpen(sf.b,sf.w);
     today=`<div class="card today"><span class="eyebrow">${fmt(t("today_t"),{d:dname})}</span><h2>${dayTitle(sf.d)}</h2>
-      <p class="small muted">${t("week")} ${sf.w} · ~${MINUTES[S.goal][S.level]} ${t("min")} · ${dayList(sf.d==="T"?"A":sf.d).length} ${t("exs")}</p>
+      <p class="small muted">${t("week")} ${sf.w} · ~${dayMin(sf.d)} ${t("min")} · ${dayList(sf.d==="T"?"A":sf.d).length} ${t("exs")}</p>
       ${isDone?`<span class="pill ok">${t("done")}</span>`:""}
       <button type="button" class="btn block" data-open="${sf.d}" data-w="${sf.w}" data-b="${sf.b}">${open?PLAY+" "+t("go"):LOCK+" "+t("see_plans")}</button></div>`;
   } else {
@@ -2329,14 +2377,14 @@ function vHome(){
       <button type="button" class="btn light" data-nav="plans">${t("see_plans")}</button></div>`;
   const chDay=challengeDay();
   return `<div class="hero"><h1>${fmt(t("hello"),{n:esc(S.name)})}</h1>
-    <div class="chips"><span class="chip">${t("goals")[GOALS.indexOf(S.goal)]}</span><span class="chip plain">${t("places")[placeIdx()]}</span><span class="chip plain">${t("levels")[S.level]}</span>${tierPill()}</div></div>
+    <div class="chips"><span class="chip">${goalLabel()}</span><span class="chip plain">${t("places")[placeIdx()]}</span><span class="chip plain">${t("levels")[S.level]}</span>${tierPill()}</div></div>
   ${today}
   ${installCard()}
   ${backupNudge()}
   ${trial}
   ${checkCard}
   <div class="card">
-    <div class="rowline"><div><span class="eyebrow">${fmt(t("block_n"),{n:b,b:blockName(b)})}</span><h3>${t("goals")[GOALS.indexOf(S.goal)]}</h3></div><span class="small muted">${fmt(t("of12"),{n})}</span></div>
+    <div class="rowline"><div><span class="eyebrow">${fmt(t("block_n"),{n:b,b:blockName(b)})}</span><h3>${goalLabel()}</h3></div><span class="small muted">${fmt(t("of12"),{n})}</span></div>
     <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="12" aria-valuenow="${n}"><i style="width:${n/12*100}%"></i></div>
   </div>
   ${lockedBlock}
@@ -2345,6 +2393,7 @@ function vHome(){
   <div class="tiles">
     <button type="button" class="tile" data-nav="mobility"><span class="eyebrow">${t("mob_t")}</span><b>${t("mob_r").mob8}</b><small>${MOB.length} · 8–18 ${t("min")}</small></button>
     <button type="button" class="tile" data-nav="abs"><span class="eyebrow">${t("abs_t")}</span><b>${t("abs_r").abs10}</b><small>${ABS.length} · 10–20 ${t("min")}</small></button>
+    ${outfitTile()}
     <button type="button" class="tile wide" data-nav="challenge"><span class="eyebrow">${t("rt_title")}</span><b>${S.ch?fmt(t("rt_day"),{d:chDay}):t("rt_start")}</b><small>${S.ch?fmt(t("rt_doneN"),{n:challengeDone()}):t("rt_prize")}</small></button>
   </div>
   ${shopStrip()}
@@ -2390,10 +2439,7 @@ function exCard(id,i,p,k){
         <button type="button" class="vreel" data-reel="${id}">${t("reel_open")}</button>
       </div>
     </div>
-    <div class="tips">
-      <div class="good"><h4>${t("how")}</h4><ul>${e.tech[S.lang].map(x=>`<li>${x}</li>`).join("")}</ul></div>
-      <div class="bad"><h4>${t("avoid")}</h4><ul>${e.err[S.lang].map(x=>`<li>${x}</li>`).join("")}</ul></div>
-    </div>
+    ${tipsBlock(id)}
     ${last?`<p class="small hist-line">${fmt(t("last_time"),{v:fmtEntry(last)})}${best&&best!==last?` · ${fmt(t("record"),{v:fmtEntry(best)})}`:""}</p>`:""}
     ${setRows(k,id,p,e)}
     <div class="ex-foot">${likeBtns(id)}
@@ -2403,7 +2449,7 @@ function exCard(id,i,p,k){
 function vSession(){
   const {b,w,d}=S.session, k=sk(b,w,d), isDone=!!S.done[k];
   const head=`<button type="button" class="back" data-act="back">${t("back")}</button>
-    <div class="hero"><span class="eyebrow">${fmt(t("block_n"),{n:b,b:blockName(b)})} · ${t("week")} ${w} · ${t("wlabels")[w-1]}</span><h1>${dayTitle(d)}</h1>
+    <div class="hero"><span class="eyebrow">${fmt(t("block_n"),{n:b,b:blockName(b)})} · ${t("week")} ${w} · ${t("wlabels")[w-1]}</span><h1>${dayTitle(d,b)}</h1>
     <div class="chips"><span class="chip">${t("levels")[S.level]}</span><span class="chip plain">${t("places")[placeIdx()]}</span></div></div>`;
   if(d==="T"){
     const f=(id,label)=>`<div class="field"><label for="t-${id}">${label}</label><input class="input" type="number" inputmode="numeric" min="0" id="t-${id}" data-test="${id}" value="${esc((S.test[b]||{})[id]||"")}"></div>`;
@@ -2412,7 +2458,7 @@ function vSession(){
   }
   const warm=`<div class="card"><h3>${t("warmup")}</h3><ul class="list small">${t("warm").map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
   const ids=dayList(d,b).map(resolveEx);
-  const exs=ids.map((id,i)=>exCard(id,i,presc(EX[id].type,S.level,w,S.goal,b),k)+(i===1?shopStrip():"")).join("");
+  const exs=ids.map((id,i)=>exCard(id,i,presc(EX[id].type,S.level,w,progKey(d,b),b),k)+(i===1?shopStrip():"")).join("");
   return head+warm+`<p class="small muted">${t("sets_hint")}</p>`+exs+`<button type="button" class="btn block" data-act="finish">${isDone?t("finished")+" ✓":t("finish")}</button>`;
 }
 
@@ -2526,7 +2572,7 @@ function vProfile(){
     <button type="button" class="btn ghost block" data-nav="plans">${t("see_plans")}</button>
   </div>
   <div class="card">
-    <div class="field"><span class="qlabel">${t("goal_l")}</span>${optGroup("pgoal",t("goals"),GOALS.indexOf(S.goal),"two")}</div>
+    <div class="field"><span class="qlabel">${t("goal_l")}</span><p class="small muted" style="margin:-4px 0 8px">${t("goal_multi")}</p>${multiGroup("pgoal",t("goals"),S.goals||[S.goal],"two")}</div>
     <div class="field"><span class="qlabel">${t("place_l")}</span>${optGroup("pplace",t("places"),placeIdx())}</div>
     <div class="field"><span class="qlabel">${t("level_l")}</span>${optGroup("level",t("levels"),S.level)}</div>
   </div>
@@ -2730,9 +2776,9 @@ function showSplash(){
   document.body.appendChild(el);
   const txt=el.querySelector(".splash-txt"); let i=0;
   const tick=setInterval(()=>{ if(i>=words.length-1){clearInterval(tick); return;} txt.classList.add("swap");
-    setTimeout(()=>{i++; txt.textContent=words[i]; txt.classList.remove("swap");},280);},1050);
+    setTimeout(()=>{i++; txt.textContent=words[i]; txt.classList.remove("swap");},280);},1300);
   const close=()=>{clearInterval(tick); el.classList.add("out"); setTimeout(()=>el.remove(),RM?0:600);};
-  el.addEventListener("click",close); setTimeout(close,RM?1500:3600);
+  el.addEventListener("click",close); setTimeout(close,RM?1500:5400);
 }
 document.addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b) return;
@@ -2780,7 +2826,7 @@ function vShop(){
   const cur=(productById(S.outfit)||{}).id, c=S.country||"kz", best=CONFIG.shop.bestseller;
   return `<button type="button" class="back" data-act="back">${t("back")}</button>
   <div class="hero"><span class="eyebrow">core. activewear</span><h1>${t("shop_t")}</h1><p class="muted">${t("shop_sub")}</p>
-    <div class="chips"><button type="button" class="chip best" data-product="${best}">${t("best_btn")}</button></div></div>
+    <div class="chips"><button type="button" class="chip best" data-product="${best}">${t("best_btn")}</button><button type="button" class="chip plain" data-nav="outfit">#COREoutfit</button></div></div>
   ${CONFIG.shop.products.map(p=>`<div class="card product">
     ${p.id===best?`<span class="ribbon">${t("best_btn")}</span>`:""}
     ${gallery(p)}
@@ -3109,6 +3155,7 @@ function summaryText(){
     L.push(`${fmtDay(d)}: ${t("sleep")} ${l.sleepH??"–"} ${t("hours")} (${q(l.sleepQ)}) · ${t("food")} ${q(l.food)} · ${t("water")} ${l.water??0}×250ml · ${t("energy")} ${q(l.energy)}${l.note?" · "+l.note:""}`);}
   if(L.length===1) L.push(t("sum_none"));
   const ci=cycleInfo(new Date()); if(ci) L.push(fmt(t("sum_cycle"),{d:ci.day,p:t("phases")[ci.phase]}));
+  if(typeof cyMode==="function"&&cyMode()!=="cycle"){L.push(fmt(t("sum_stage"),{p:t("cy_modes")[cyMode()==="meno"?2:1]})); const mt=(S.log[dkey(new Date())]||{}).meno||[]; if(mt.length) L.push(fmt(t("meno_today"),{s:mt.map(i=>t("meno_tags")[i]).join(", ")}));}
   if(S.favs.length) L.push(t("lk_fav")+": "+S.favs.map(exName).join(", "));
   if(S.diss.length) L.push(t("lk_dis")+": "+S.diss.map(exName).join(", "));
   L.push(t("wk_title")+": "+t("dows").map((d,i)=>d.slice(0,2)+" "+S.micro[i]).join(", "));
@@ -3125,10 +3172,7 @@ function openExInfo(id){
     <div class="rowline"><h3>${esc(exName(id))}</h3><button type="button" class="rbtn sm" data-act="sheetClose" aria-label="${t("close")}">✕</button></div>
     <div class="viewer"><canvas id="sheetCanvas" role="img" aria-label="${esc(exName(id))}"></canvas>
       <div class="vctrl"><button type="button" data-vmode="ok" aria-pressed="true">${t("v_ok")}</button><button type="button" data-vmode="err" aria-pressed="false">${t("v_err")}</button></div></div>
-    <div class="tips">
-      <div class="good"><h4>${t("how")}</h4><ul>${e.tech[S.lang].map(x=>`<li>${x}</li>`).join("")}</ul></div>
-      <div class="bad"><h4>${t("avoid")}</h4><ul>${e.err[S.lang].map(x=>`<li>${x}</li>`).join("")}</ul></div>
-    </div>
+    ${tipsBlock(id)}
     <div class="ex-foot">${likeBtns(id)}</div>
   </div>`;
   document.body.appendChild(el); document.body.classList.add("noscroll");
@@ -3655,6 +3699,331 @@ LOC.kk="kk-KZ";
 
 
 /* =========================================================
+   v3: several goals + "Salud", menopause, 3 key tips,
+   muscle map, outfits (upload + outfit of the month)
+   ========================================================= */
+
+/* ---------- config the owner edits: outfit of the month ---------- */
+CONFIG.outfit={
+  month:"",          // "2026-11"
+  img:"",            // URL of the winner photo (e.g. "img/outfit-2026-11.jpg" uploaded to GitHub)
+  name:"",           // "Aigerim"
+  ig:"",             // "@aigerim.fit"
+  set:"negro",       // set she wears (id from CONFIG.shop.products)
+  prize:"10 %"
+};
+
+/* ---------- texts ---------- */
+const V3T={
+ es:{goal5:"Salud",goal5_d:"Mantenerte activa y sana: fuerza básica, movilidad y espalda fuerte, sin exigirte de más.",
+  goal_multi:"Elige todos los que quieras.",goal_mix:"Combinamos tus objetivos: cada entreno de la semana trabaja uno de ellos y van rotando en cada bloque.",goal_min:"Elige al menos un objetivo.",
+  dt:{hl1:"Salud: fuerza básica",hl2:"Salud: postura y espalda",hl3:"Salud: equilibrio y movilidad"},
+  cy_mode:"¿En qué etapa estás?",cy_modes:["Tengo ciclo","Perimenopausia","Menopausia"],
+  meno_sub:"Sin ciclo que seguir: anota cómo te sientes y entrena con las claves de esta etapa.",
+  peri_sub:"Tu ciclo puede volverse irregular: marca tus periodos si los tienes y anota tus síntomas.",
+  meno_sym:"Hoy he notado",meno_tags:["Sofocos","Sudores nocturnos","Dormí mal","Poca energía","Cambios de ánimo","Dolor articular","Me siento bien"],
+  meno_7:"Tus últimos 7 días",meno_tips_t:"Claves para esta etapa",
+  meno_tips:["La fuerza es tu mejor aliada: protege huesos y músculo. Prioriza los ejercicios principales y sube el peso poco a poco.","Reparte la proteína en todas las comidas y pregunta a tu médico por el calcio y la vitamina D.","Si tienes sofocos, entrena en un sitio fresco, con agua cerca y ropa ligera por capas.","Suma movilidad y trabajo de core: la zona de Movilidad y Pilates te ayuda."],
+  meno_today:"Hoy: {s}",meno_disc:"Información general, no consejo médico. Si los síntomas te afectan en tu día a día, habla con tu ginecóloga.",sum_stage:"Etapa: {p}",
+  mus_t:"Músculos que trabajas",mus_main:"Principal",mus_sec:"Secundario",mus_front:"Delante",mus_back:"Detrás",
+  mus:{glutes:"Glúteos",gmed:"Glúteo medio",quads:"Cuádriceps",hams:"Isquiotibiales",adductors:"Aductores",calves:"Gemelos",abs:"Abdomen",obliques:"Oblicuos",lowback:"Lumbares",lats:"Dorsales",upback:"Espalda alta",traps:"Trapecio",chest:"Pecho",delts:"Hombros",biceps:"Bíceps",triceps:"Tríceps",forearms:"Antebrazos",hipflex:"Flexores de cadera"},
+  of_tile:"Sube tu outfit",of_tile_s:"Participa en el outfit del mes",of_t:"Outfits CORE",of_sub:"Enséñanos cómo entrenas con tu CORE. Cada mes elegimos un outfit del mes.",
+  om_t:"Outfit del mes",om_empty:"Este mes aún no hay ganadora. ¡Puede ser tu foto!",om_wears:"Lleva {s}",om_see:"Ver el set",
+  up_t:"Sube tu outfit",up_sub:"Elige una foto con tu set CORE: te la preparamos con el marco de CORE, lista para compartir.",
+  up_btn:"Elegir foto",up_change:"Cambiar foto",up_set:"¿Qué set llevas?",up_share:"Compartir en Instagram",up_wa:"Enviar a CORE para participar",
+  up_wa_msg:"Hola, soy {n} y participo en el outfit del mes de CORE. Te adjunto mi foto 📸",up_err:"No se pudo abrir la foto.",
+  up_rules_t:"Cómo participar",up_rules:["Hazte una foto con tu set CORE: en el gimnasio, en casa o en la calle.","Compártela en tus historias etiquetando a {h} con #COREoutfit, o envíanosla por WhatsApp.","Elegimos una ganadora al mes: sale en la app y gana un {p} de descuento en su próximo set."],
+  up_private:"Tu foto se queda en este móvil hasta que tú decidas compartirla."},
+ en:{goal5:"Health",goal5_d:"Stay active and healthy: basic strength, mobility and a strong back, without overdoing it.",
+  goal_multi:"Pick as many as you like.",goal_mix:"We combine your goals: each workout of the week focuses on one of them, rotating every block.",goal_min:"Pick at least one goal.",
+  dt:{hl1:"Health: basic strength",hl2:"Health: posture & back",hl3:"Health: balance & mobility"},
+  cy_mode:"Which stage are you in?",cy_modes:["I have a cycle","Perimenopause","Menopause"],
+  meno_sub:"No cycle to track: log how you feel and train with the keys for this stage.",
+  peri_sub:"Your cycle may become irregular: log your periods if you have them and note your symptoms.",
+  meno_sym:"Today I noticed",meno_tags:["Hot flushes","Night sweats","Slept badly","Low energy","Mood changes","Joint pain","Feeling good"],
+  meno_7:"Your last 7 days",meno_tips_t:"Keys for this stage",
+  meno_tips:["Strength training is your best ally: it protects bone and muscle. Prioritise the main lifts and add weight gradually.","Spread protein across every meal and ask your doctor about calcium and vitamin D.","If you get hot flushes, train somewhere cool, keep water close and wear light layers.","Add mobility and core work: the Mobility & Pilates zone helps."],
+  meno_today:"Today: {s}",meno_disc:"General information, not medical advice. If symptoms affect your daily life, talk to your gynaecologist.",sum_stage:"Stage: {p}",
+  mus_t:"Muscles you work",mus_main:"Main",mus_sec:"Secondary",mus_front:"Front",mus_back:"Back",
+  mus:{glutes:"Glutes",gmed:"Glute medius",quads:"Quads",hams:"Hamstrings",adductors:"Adductors",calves:"Calves",abs:"Abs",obliques:"Obliques",lowback:"Lower back",lats:"Lats",upback:"Upper back",traps:"Traps",chest:"Chest",delts:"Shoulders",biceps:"Biceps",triceps:"Triceps",forearms:"Forearms",hipflex:"Hip flexors"},
+  of_tile:"Share your outfit",of_tile_s:"Enter the outfit of the month",of_t:"CORE outfits",of_sub:"Show us how you train in your CORE. Every month we pick an outfit of the month.",
+  om_t:"Outfit of the month",om_empty:"No winner yet this month. It could be your photo!",om_wears:"Wearing {s}",om_see:"See the set",
+  up_t:"Share your outfit",up_sub:"Pick a photo in your CORE set: we add the CORE frame so it's ready to share.",
+  up_btn:"Choose photo",up_change:"Change photo",up_set:"Which set are you wearing?",up_share:"Share to Instagram",up_wa:"Send to CORE to enter",
+  up_wa_msg:"Hi, I'm {n} and I'm entering the CORE outfit of the month. Here's my photo 📸",up_err:"Couldn't open the photo.",
+  up_rules_t:"How to enter",up_rules:["Take a photo in your CORE set: at the gym, at home or out and about.","Share it in your stories tagging {h} with #COREoutfit, or send it to us on WhatsApp.","We pick one winner a month: she's featured in the app and gets {p} off her next set."],
+  up_private:"Your photo stays on this phone until you decide to share it."},
+ ru:{goal5:"Здоровье",goal5_d:"Оставаться активной и здоровой: базовая сила, мобильность и крепкая спина без перегрузок.",
+  goal_multi:"Выберите сколько угодно.",goal_mix:"Мы совмещаем ваши цели: каждая тренировка недели посвящена одной из них, и они чередуются в каждом блоке.",goal_min:"Выберите хотя бы одну цель.",
+  dt:{hl1:"Здоровье: базовая сила",hl2:"Здоровье: осанка и спина",hl3:"Здоровье: баланс и мобильность"},
+  cy_mode:"На каком вы этапе?",cy_modes:["У меня есть цикл","Перименопауза","Менопауза"],
+  meno_sub:"Цикла для отслеживания нет: отмечайте самочувствие и тренируйтесь с учётом этого этапа.",
+  peri_sub:"Цикл может стать нерегулярным: отмечайте месячные, если они есть, и записывайте симптомы.",
+  meno_sym:"Сегодня я заметила",meno_tags:["Приливы","Ночная потливость","Плохо спала","Мало энергии","Перепады настроения","Боль в суставах","Чувствую себя хорошо"],
+  meno_7:"Ваши последние 7 дней",meno_tips_t:"Главное на этом этапе",
+  meno_tips:["Силовые тренировки — ваш лучший союзник: они защищают кости и мышцы. Делайте упор на основные упражнения и постепенно добавляйте вес.","Распределяйте белок по всем приёмам пищи и спросите врача о кальции и витамине D.","Если бывают приливы, тренируйтесь в прохладе, держите воду рядом и одевайтесь в лёгкие слои.","Добавьте мобильность и работу с кором: поможет зона «Мобильность и пилатес»."],
+  meno_today:"Сегодня: {s}",meno_disc:"Это общая информация, а не медицинский совет. Если симптомы мешают в повседневной жизни, обратитесь к гинекологу.",sum_stage:"Этап: {p}",
+  mus_t:"Какие мышцы работают",mus_main:"Основные",mus_sec:"Вспомогательные",mus_front:"Спереди",mus_back:"Сзади",
+  mus:{glutes:"Ягодицы",gmed:"Средняя ягодичная",quads:"Квадрицепсы",hams:"Задняя поверхность бедра",adductors:"Приводящие",calves:"Икры",abs:"Пресс",obliques:"Косые мышцы",lowback:"Поясница",lats:"Широчайшие",upback:"Верх спины",traps:"Трапеция",chest:"Грудь",delts:"Плечи",biceps:"Бицепс",triceps:"Трицепс",forearms:"Предплечья",hipflex:"Сгибатели бедра"},
+  of_tile:"Покажите свой образ",of_tile_s:"Участвуйте в конкурсе «Образ месяца»",of_t:"Образы CORE",of_sub:"Покажите, как вы тренируетесь в CORE. Каждый месяц мы выбираем образ месяца.",
+  om_t:"Образ месяца",om_empty:"В этом месяце победительницы пока нет. Это может быть ваше фото!",om_wears:"На ней {s}",om_see:"Смотреть комплект",
+  up_t:"Покажите свой образ",up_sub:"Выберите фото в комплекте CORE: мы добавим рамку CORE, и им можно будет сразу поделиться.",
+  up_btn:"Выбрать фото",up_change:"Сменить фото",up_set:"Какой комплект на вас?",up_share:"Поделиться в Instagram",up_wa:"Отправить в CORE для участия",
+  up_wa_msg:"Здравствуйте, это {n}, участвую в конкурсе «Образ месяца» CORE. Прикрепляю фото 📸",up_err:"Не удалось открыть фото.",
+  up_rules_t:"Как участвовать",up_rules:["Сфотографируйтесь в комплекте CORE: в зале, дома или на улице.","Выложите фото в сторис с отметкой {h} и #COREoutfit или пришлите нам в WhatsApp.","Каждый месяц выбираем одну победительницу: её фото появится в приложении, а она получит скидку {p} на следующий комплект."],
+  up_private:"Фото остаётся на этом телефоне, пока вы сами не решите им поделиться."},
+ kk:{goal5:"Денсаулық",goal5_d:"Белсенді әрі сау болу: негізгі күш, қозғалғыштық және мықты арқа, артық күш салмай.",
+  goal_multi:"Қалағаныңызша таңдаңыз.",goal_mix:"Мақсаттарыңызды біріктіреміз: аптаның әр жаттығуы солардың біріне арналады және әр блокта ауысып отырады.",goal_min:"Кемінде бір мақсат таңдаңыз.",
+  dt:{hl1:"Денсаулық: негізгі күш",hl2:"Денсаулық: дене қалпы мен арқа",hl3:"Денсаулық: тепе-теңдік пен қозғалғыштық"},
+  cy_mode:"Қай кезеңдесіз?",cy_modes:["Циклым бар","Перименопауза","Менопауза"],
+  meno_sub:"Бақылайтын цикл жоқ: көңіл-күйіңізді белгілеп, осы кезеңге сай жаттығыңыз.",
+  peri_sub:"Цикл тұрақсыз болуы мүмкін: етеккір болса, белгілеп, белгілеріңізді жазып отырыңыз.",
+  meno_sym:"Бүгін байқағаным",meno_tags:["Ыстық басу","Түнгі терлеу","Нашар ұйықтадым","Қуат аз","Көңіл-күй ауытқуы","Буын ауыруы","Жақсы сезінемін"],
+  meno_7:"Соңғы 7 күніңіз",meno_tips_t:"Осы кезеңдегі басты нәрселер",
+  meno_tips:["Күш жаттығулары — ең жақсы көмекшіңіз: сүйек пен бұлшықетті қорғайды. Негізгі жаттығуларға басымдық беріп, салмақты біртіндеп қосыңыз.","Ақуызды әр тамаққа бөліп, кальций мен D дәрумені туралы дәрігерден сұраңыз.","Ыстық басса, салқын жерде жаттығып, суды жаныңызда ұстаңыз және жеңіл қабатты киім киіңіз.","Қозғалғыштық пен кор жаттығуларын қосыңыз: «Қозғалғыштық және пилатес» бөлімі көмектеседі."],
+  meno_today:"Бүгін: {s}",meno_disc:"Бұл жалпы ақпарат, медициналық кеңес емес. Белгілер күнделікті өміріңізге кедергі келтірсе, гинекологқа барыңыз.",sum_stage:"Кезең: {p}",
+  mus_t:"Жұмыс істейтін бұлшықеттер",mus_main:"Негізгі",mus_sec:"Қосымша",mus_front:"Алдынан",mus_back:"Артынан",
+  mus:{glutes:"Бөксе",gmed:"Ортаңғы бөксе",quads:"Төрт басты",hams:"Санның артқы беті",adductors:"Әкелгіш бұлшықеттер",calves:"Балтыр",abs:"Пресс",obliques:"Қиғаш бұлшықеттер",lowback:"Бел",lats:"Жалпақ бұлшықеттер",upback:"Арқаның жоғарғы бөлігі",traps:"Трапеция",chest:"Кеуде",delts:"Иық",biceps:"Бицепс",triceps:"Трицепс",forearms:"Білек",hipflex:"Сан бүккіштері"},
+  of_tile:"Образыңызды көрсетіңіз",of_tile_s:"«Ай образы» байқауына қатысыңыз",of_t:"CORE образдары",of_sub:"CORE киімімен қалай жаттығатыныңызды көрсетіңіз. Ай сайын ай образын таңдаймыз.",
+  om_t:"Ай образы",om_empty:"Бұл айда әзірге жеңімпаз жоқ. Бұл сіздің фотоңыз болуы мүмкін!",om_wears:"Үстінде: {s}",om_see:"Жиынтықты көру",
+  up_t:"Образыңызды көрсетіңіз",up_sub:"CORE жиынтығымен түскен фотоны таңдаңыз: CORE жақтауын қосамыз, бірден бөлісе аласыз.",
+  up_btn:"Фото таңдау",up_change:"Фотоны ауыстыру",up_set:"Қай жиынтықты кидіңіз?",up_share:"Instagram-да бөлісу",up_wa:"Қатысу үшін CORE-ға жіберу",
+  up_wa_msg:"Сәлеметсіз бе, бұл {n}, CORE-дың «Ай образы» байқауына қатысамын. Фотомды жіберемін 📸",up_err:"Фотоны ашу мүмкін болмады.",
+  up_rules_t:"Қалай қатысуға болады",up_rules:["CORE жиынтығымен суретке түсіңіз: залда, үйде немесе көшеде.","Оны {h} белгілеп, #COREoutfit хэштегімен сторис-ке салыңыз немесе WhatsApp арқылы жіберіңіз.","Ай сайын бір жеңімпазды таңдаймыз: оның фотосы қолданбада шығады және келесі жиынтыққа {p} жеңілдік алады."],
+  up_private:"Өзіңіз бөлісуді шешпейінше, фото осы телефонда қалады."}
+};
+for(const l in V3T){ if(!T[l]) continue; const v=V3T[l];
+  T[l].goals=[...T[l].goals.slice(0,4),v.goal5]; T[l].goals_d=[...T[l].goals_d.slice(0,4),v.goal5_d];
+  T[l].dt=Object.assign({},T[l].dt,v.dt);
+  const rest=Object.assign({},v); delete rest.goal5; delete rest.goal5_d; delete rest.dt;
+  Object.assign(T[l],rest);
+}
+
+/* ---------- 3 key points + muscle map ---------- */
+function tipsBlock(id){
+  const e=EX[id], te=e.tech[S.lang]||e.tech.ru, er=e.err[S.lang]||e.err.ru;
+  const how=[te[0],te[te.length-1]].filter((x,i,a)=>x&&a.indexOf(x)===i);
+  return `<div class="tips">
+      <div class="good"><h4>${t("how")}</h4><ul>${how.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+      <div class="bad"><h4>${t("avoid")}</h4><ul><li>${er[0]}</li></ul></div>
+    </div>${bodyMap(id)}`;
+}
+const MUSCLES={
+ hip_thrust:[["glutes"],["hams","gmed"]], goblet_squat:[["quads","glutes"],["adductors","abs"]], rdl:[["hams","glutes"],["lowback"]],
+ split_squat:[["quads","glutes"],["adductors","hams"]], band_abduction:[["gmed"],["glutes"]], dead_bug:[["abs"],["obliques","hipflex"]],
+ db_row:[["lats","upback"],["biceps","delts"]], pushup:[["chest","triceps"],["delts","abs"]], shoulder_press:[["delts"],["triceps","traps"]],
+ band_pull_apart:[["upback","delts"],["traps"]], biceps_curl:[["biceps"],["forearms"]], plank:[["abs"],["obliques","delts"]],
+ step_up:[["quads","glutes"],["hams","calves"]], thruster:[["quads","delts"],["glutes","triceps"]], reverse_lunge:[["glutes","quads"],["hams","adductors"]],
+ single_bridge:[["glutes"],["hams","gmed"]], side_plank:[["obliques"],["abs","gmed"]], climbers:[["abs"],["hipflex","delts","quads"]],
+ crunch:[["abs"],["obliques"]], reverse_crunch:[["abs"],["hipflex"]], bicycle:[["obliques","abs"],["hipflex"]], leg_raise:[["abs","hipflex"],[]],
+ hollow_hold:[["abs"],["hipflex","obliques"]], bird_dog:[["lowback","glutes"],["abs","delts"]], glute_bridge:[["glutes"],["hams"]],
+ back_squat:[["quads","glutes"],["adductors","lowback"]], air_squat:[["quads","glutes"],["adductors"]], sl_rdl:[["hams","glutes"],["gmed","lowback"]],
+ lat_pulldown:[["lats"],["biceps","upback"]], superman_row:[["upback","lowback"],["lats","glutes"]], db_bench:[["chest"],["triceps","delts"]],
+ knee_pushup:[["chest","triceps"],["delts","abs"]], pike_pushup:[["delts"],["triceps","traps"]], cable_abduction:[["gmed"],["glutes"]],
+ face_pull:[["delts","upback"],["traps"]], prone_y:[["upback","traps"],["delts"]], chair_dip:[["triceps"],["chest","delts"]],
+ cat_cow:[["lowback","abs"],[]], child_pose:[["lowback","lats"],["glutes"]], hip_flexor:[["hipflex","quads"],[]], ham_stretch:[["hams"],["calves"]],
+ cobra:[["abs"],["lowback"]], hundred:[["abs"],["hipflex"]], roll_up:[["abs"],["hipflex","lowback"]], sl_stretch:[["abs"],["hipflex","obliques"]]
+};
+const MAP_SHAPES={
+ front:{
+  traps:['<path d="M33 30 L40 28.5 L47 30 L52 33.5 L28 33.5Z"/>'],
+  delts:['<ellipse cx="21" cy="38" rx="5.6" ry="6"/>','<ellipse cx="59" cy="38" rx="5.6" ry="6"/>'],
+  chest:['<path d="M27.5 37 Q34 34.5 39.2 36.5 L39.2 49 Q33 52.5 27.5 48.5Z"/>','<path d="M52.5 37 Q46 34.5 40.8 36.5 L40.8 49 Q47 52.5 52.5 48.5Z"/>'],
+  biceps:['<ellipse cx="17.6" cy="53" rx="3.6" ry="9"/>','<ellipse cx="62.4" cy="53" rx="3.6" ry="9"/>'],
+  forearms:['<ellipse cx="16" cy="80" rx="3.2" ry="10"/>','<ellipse cx="64" cy="80" rx="3.2" ry="10"/>'],
+  abs:['<rect x="34.2" y="53.5" width="11.6" height="33" rx="4"/>'],
+  obliques:['<path d="M27.5 55 L32.8 56 L32.8 87 L28.2 87 Q26 71 27.5 55Z"/>','<path d="M52.5 55 L47.2 56 L47.2 87 L51.8 87 Q54 71 52.5 55Z"/>'],
+  hipflex:['<ellipse cx="32.5" cy="96" rx="3" ry="4"/>','<ellipse cx="47.5" cy="96" rx="3" ry="4"/>'],
+  quads:['<ellipse cx="30.4" cy="119" rx="6.3" ry="16"/>','<ellipse cx="49.6" cy="119" rx="6.3" ry="16"/>'],
+  adductors:['<ellipse cx="37.4" cy="110" rx="2.4" ry="8"/>','<ellipse cx="42.6" cy="110" rx="2.4" ry="8"/>'],
+  calves:['<ellipse cx="30.6" cy="151" rx="3.6" ry="10"/>','<ellipse cx="49.4" cy="151" rx="3.6" ry="10"/>']
+ },
+ back:{
+  traps:['<path d="M40 26.5 L51 34 L47 36.4 L33 36.4 L29 34Z"/>','<path d="M38.7 37.2 L41.3 37.2 L40.8 49 L39.2 49Z"/>'],
+  upback:['<path d="M33.2 37.2 L37.9 37.2 L37.9 50.5 L34.2 50.5Z"/>','<path d="M46.8 37.2 L42.1 37.2 L42.1 50.5 L45.8 50.5Z"/>'],
+  delts:['<ellipse cx="21" cy="38" rx="5.6" ry="6"/>','<ellipse cx="59" cy="38" rx="5.6" ry="6"/>'],
+  lats:['<path d="M27.2 42 Q32 49 35.5 67 L30 72 Q25.6 58 27.2 42Z"/>','<path d="M52.8 42 Q48 49 44.5 67 L50 72 Q54.4 58 52.8 42Z"/>'],
+  triceps:['<ellipse cx="17.6" cy="53" rx="3.6" ry="9"/>','<ellipse cx="62.4" cy="53" rx="3.6" ry="9"/>'],
+  forearms:['<ellipse cx="16" cy="80" rx="3.2" ry="10"/>','<ellipse cx="64" cy="80" rx="3.2" ry="10"/>'],
+  lowback:['<rect x="35" y="62" width="10" height="24" rx="4"/>'],
+  gmed:['<ellipse cx="27.2" cy="94" rx="4" ry="4.4"/>','<ellipse cx="52.8" cy="94" rx="4" ry="4.4"/>'],
+  glutes:['<ellipse cx="32.8" cy="103.5" rx="7" ry="8"/>','<ellipse cx="47.2" cy="103.5" rx="7" ry="8"/>'],
+  hams:['<ellipse cx="30.8" cy="125" rx="6" ry="13.5"/>','<ellipse cx="49.2" cy="125" rx="6" ry="13.5"/>'],
+  calves:['<ellipse cx="30.8" cy="150" rx="4.6" ry="10"/>','<ellipse cx="49.2" cy="150" rx="4.6" ry="10"/>']
+ }
+};
+const SILH='<ellipse cx="40" cy="13.5" rx="8.5" ry="10.5"/><rect x="36" y="22" width="8" height="8" rx="3"/>'+
+ '<path d="M24 31.5 Q40 26.5 56 31.5 Q61 34 60.5 41 L56.5 60 L56.5 87 L59.5 100 L20.5 100 L23.5 87 L23.5 60 L19.5 41 Q19 34 24 31.5Z"/>'+
+ '<rect x="13" y="33" width="9.5" height="40" rx="4.7"/><rect x="57.5" y="33" width="9.5" height="40" rx="4.7"/>'+
+ '<rect x="11.8" y="69" width="8.4" height="35" rx="4.2"/><rect x="59.8" y="69" width="8.4" height="35" rx="4.2"/>'+
+ '<rect x="22" y="96" width="17" height="45" rx="7.5"/><rect x="41" y="96" width="17" height="45" rx="7.5"/>'+
+ '<rect x="25" y="136" width="12" height="31" rx="5"/><rect x="43" y="136" width="12" height="31" rx="5"/>';
+function bodySvg(side,main,sec,label){
+  const parts=Object.entries(MAP_SHAPES[side]).map(([m,arr])=>{
+    const cls=main.includes(m)?"m1":sec.includes(m)?"m2":"m0";
+    return `<g class="${cls}">${arr.join("")}</g>`;}).join("");
+  return `<figure class="bfig"><svg viewBox="0 0 80 170" role="img" aria-label="${esc(label)}"><g class="silh">${SILH}</g>${parts}</svg><figcaption>${label}</figcaption></figure>`;
+}
+function bodyMap(id){
+  const m=MUSCLES[id]; if(!m) return "";
+  const [main,sec]=m, n=k=>t("mus")[k]||k;
+  return `<div class="musmap"><div class="bfigs">${bodySvg("front",main,sec,t("mus_front"))}${bodySvg("back",main,sec,t("mus_back"))}</div>
+    <div class="mlist"><h4>${t("mus_t")}</h4>
+      <p class="small"><span class="dot m1"></span><b>${t("mus_main")}:</b> ${main.map(n).join(", ")}</p>
+      ${sec.length?`<p class="small"><span class="dot m2"></span><b>${t("mus_sec")}:</b> ${sec.map(n).join(", ")}</p>`:""}</div></div>`;
+}
+
+/* ---------- menopause / perimenopause ---------- */
+const cyMode=()=>(S.cycle&&S.cycle.mode)||"cycle";
+function cycleInfo(date){
+  if(cyMode()==="meno"||!S.cycle.last) return null;
+  const len=cycleLen(), plen=Math.min(10,Math.max(2,+S.cycle.plen||5));
+  const since=dayDiff(date,parseD(S.cycle.last)); if(since<0) return null;
+  const day=since%len+1, ov=len-14;
+  const phase=day<=plen?0:day<ov-1?1:day<=ov+1?2:3;
+  const next=new Date(parseD(S.cycle.last)); next.setDate(next.getDate()+(Math.floor(since/len)+1)*len);
+  return {day,len,plen,ov,phase,next};
+}
+function vDiaryCycleV2(){
+  const ci=cycleInfo(new Date()); let viz="";
+  if(ci){
+    const seg=(n,c)=>`<i style="width:${n/ci.len*100}%;background:${c}"></i>`;
+    const fol=Math.max(0,ci.ov-1-ci.plen-1), lut=Math.max(0,ci.len-(ci.ov+1));
+    viz=`<div class="card">
+      <h3>${t("phases")[ci.phase]}</h3><p class="small muted">${fmt(t("cy_day"),{d:ci.day})} · ${fmt(t("cy_next"),{f:fmtDay(ci.next,{day:"numeric",month:"long"})})}</p>
+      <div class="cycbar">${seg(ci.plen,"var(--err)")}${seg(fol+1,"var(--soft)")}${seg(3,"var(--beige)")}${seg(lut,"var(--line)")}<b style="left:calc(${(ci.day-0.5)/ci.len*100}% - 2px)"></b></div>
+      <div class="chips">${t("phases").map((p,i)=>`<span class="chip ${i===ci.phase?"":"plain"}">${p}</span>`).join("")}</div>
+      <p class="small">${t("ptips")[ci.phase]}</p></div>`;
+  }
+  const hs=[...S.cycle.hist].sort().reverse(), today=dkey(new Date());
+  return `${viz||`<div class="card"><h3>${t("cy_title")}</h3><p class="small muted">${t("cy_empty")}</p></div>`}
+  <div class="card">
+    ${S.cycle.hist.includes(today)?"":`<button type="button" class="btn block" data-act="periodToday">${t("cy_start")}</button>`}
+    <h4>${t("cy_hist")}</h4>
+    <p class="small muted">${hs.length?t("cy_hist_sub"):t("cy_none_yet")}</p>
+    <div class="cyrows">
+      ${hs.length?hs.map((d,i)=>`<div class="cyrow"><label class="sr" for="cyh${i}">${t("cy_last")}</label>
+        <input class="input" type="date" id="cyh${i}" data-cyh="${d}" max="${today}" value="${d}">
+        <button type="button" class="btn ghost sm" data-cydel="${d}" aria-label="${t("cy_del")} ${d}">${t("cy_del")}</button></div>`).join("")
+      :`<div class="field"><label for="cyNew">${t("cy_last")}</label><input class="input" type="date" id="cyNew" data-cyh="" max="${today}"></div>`}
+    </div>
+    ${hs.length?`<button type="button" class="btn ghost sm" data-act="cyAdd">+ ${t("cy_add")}</button>`:""}
+    ${S.cycle.hist.length>1?`<p class="small muted">${fmt(t("cy_avg"),{n:cycleLen()})}</p>`:""}
+    <div class="grid2">
+      <div class="field"><label for="cyLen">${t("cy_len")}</label><input class="input" type="number" inputmode="numeric" min="18" max="45" id="cyLen" data-cy="len" value="${esc(S.cycle.len)}"></div>
+      <div class="field"><label for="cyPlen">${t("cy_plen")}</label><input class="input" type="number" inputmode="numeric" min="2" max="10" id="cyPlen" data-cy="plen" value="${esc(S.cycle.plen)}"></div>
+    </div>
+  </div>`;
+}
+function menoCard(){
+  const today=dkey(new Date()), l=S.log[today]||{}, sel=l.meno||[], tags=t("meno_tags");
+  const days=[]; for(let i=6;i>=0;i--){const d=new Date(); d.setDate(d.getDate()-i); days.push(d);}
+  const week=days.map(d=>{const x=(S.log[dkey(d)]||{}).meno||[]; const bad=x.filter(i=>i<6).length;
+    return `<div class="mday"><span class="mdots">${x.length?(x.includes(6)&&!bad?"<i class=ok></i>":Array.from({length:Math.min(4,bad)},()=>"<i></i>").join("")):"–"}</span><span>${fmtDay(d,{weekday:"narrow"})}</span></div>`;}).join("");
+  return `<div class="card"><h3>${t("meno_sym")}</h3>
+    <div class="chips wrap">${tags.map((g,i)=>`<button type="button" class="chip ${sel.includes(i)?"":"plain"}" data-meno="${i}" aria-pressed="${sel.includes(i)}">${g}</button>`).join("")}</div>
+    <h4>${t("meno_7")}</h4><div class="mweek">${week}</div></div>
+  <div class="card"><h3>${t("meno_tips_t")}</h3><ul class="list small">${t("meno_tips").map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
+}
+function vDiaryCycle(){
+  const mode=cyMode(), modes=["cycle","peri","meno"];
+  const pick=`<div class="card"><h4>${t("cy_mode")}</h4><div class="opts" role="group" aria-label="${t("cy_mode")}">${t("cy_modes").map((m,i)=>
+    `<button type="button" class="opt" data-cymode="${modes[i]}" aria-pressed="${mode===modes[i]}"><b>${m}</b></button>`).join("")}</div>
+    ${mode!=="cycle"?`<p class="small muted">${t(mode==="meno"?"meno_sub":"peri_sub")}</p>`:""}</div>`;
+  let body;
+  if(mode==="meno") body=menoCard()+`<p class="note">${t("meno_disc")}</p>`;
+  else if(mode==="peri") body=vDiaryCycleV2()+menoCard()+`<p class="note">${t("meno_disc")}</p>`;
+  else body=vDiaryCycleV2()+`<p class="note">${t("cy_disc")}</p>`;
+  return pick+body+`<p class="note">${t("local_note")}</p>`;
+}
+/* ---------- outfits ---------- */
+const OUT={src:null,url:null,file:null,set:null,busy:false};
+function shrinkTo(file,m){
+  return new Promise((res,rej)=>{const url=URL.createObjectURL(file), img=new Image();
+    img.onload=()=>{const s=Math.min(1,m/Math.max(img.width,img.height)), c=document.createElement("canvas");
+      c.width=Math.round(img.width*s); c.height=Math.round(img.height*s); c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      URL.revokeObjectURL(url); res(c.toDataURL("image/jpeg",0.88));};
+    img.onerror=()=>{URL.revokeObjectURL(url); rej(new Error("img"));}; img.src=url;});
+}
+async function makeOutfitStory(){
+  try{await document.fonts.ready;}catch(e){}
+  const W=1080,H=1920,c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
+  x.fillStyle="#FBF8F3"; x.fillRect(0,0,W,H);
+  const g=x.createRadialGradient(1000,1850,0,1000,1850,520); g.addColorStop(0,"rgba(201,184,165,.75)"); g.addColorStop(1,"rgba(251,248,243,0)"); x.fillStyle=g; x.fillRect(0,0,W,H);
+  const load=s=>new Promise(r=>{const i=new Image(); i.onload=()=>r(i); i.onerror=()=>r(null); i.src=s;});
+  const lg=await load(LOGO), ph=await load(OUT.src);
+  if(lg){const w=360,h=w*39.1/164.2; x.drawImage(lg,(W-w)/2,110,w,h); x.fillStyle="#161412"; x.textAlign="center"; x.font="700 26px Montserrat, sans-serif"; try{x.letterSpacing="10px";}catch(e){} x.fillText("ACTIVEWEAR",W/2+5,110+h+42); try{x.letterSpacing="0px";}catch(e){}}
+  const bx=70,by=290,bw=W-140,bh=1280,r=36;
+  x.save(); x.beginPath(); x.moveTo(bx+r,by); x.arcTo(bx+bw,by,bx+bw,by+bh,r); x.arcTo(bx+bw,by+bh,bx,by+bh,r); x.arcTo(bx,by+bh,bx,by,r); x.arcTo(bx,by,bx+bw,by,r); x.closePath(); x.clip();
+  x.fillStyle="#EFE7DC"; x.fillRect(bx,by,bw,bh);
+  if(ph){const s=Math.max(bw/ph.width,bh/ph.height), w=ph.width*s, h=ph.height*s; x.drawImage(ph,bx+(bw-w)/2,by+(bh-h)/2,w,h);}
+  x.restore();
+  const p=productById(OUT.set||S.outfit);
+  x.fillStyle="#161412"; x.textAlign="center";
+  x.font="800 62px Fraunces, Georgia, serif"; x.fillText("#COREoutfit",W/2,1680);
+  x.font="600 34px Montserrat, sans-serif"; x.fillText((p?p.name[S.lang]||p.name.ru:"")+"  ·  "+(HANDLES[S.country]||HANDLES.ve),W/2,1745);
+  x.font="italic 800 54px Fraunces, Georgia, serif"; x.fillText("girl, do it for you!",W/2,1840);
+  return c.toDataURL("image/jpeg",0.9);
+}
+async function prepOutfit(){
+  OUT.busy=true; OUT.file=null;
+  try{OUT.url=await makeOutfitStory(); const blob=await (await fetch(OUT.url)).blob(); OUT.file=new File([blob],"core-outfit.jpg",{type:"image/jpeg"});}catch(e){}
+  OUT.busy=false;
+}
+function vOutfit(){
+  const cfg=CONFIG.outfit, h=HANDLES[S.country]||HANDLES.ve, wp=productById(cfg.set)||CONFIG.shop.products[0];
+  const mName=cfg.month?fmtDay(new Date(+cfg.month.slice(0,4),+cfg.month.slice(5,7)-1,1),{month:"long",year:"numeric"}):fmtDay(new Date(),{month:"long",year:"numeric"});
+  const month=`<div class="card om"><div class="rowline"><div><span class="eyebrow">${t("om_t")}</span><h3 class="cap">${mName}</h3></div><span class="chip">★</span></div>
+    ${cfg.img?`<div class="omimg"><img src="${esc(cfg.img)}" alt="${esc(t("om_t")+" "+(cfg.name||""))}"></div>
+      <p><b>${esc(cfg.name)}</b> ${cfg.ig?`<a class="link" href="https://instagram.com/${esc(cfg.ig.replace("@",""))}">${esc(cfg.ig)}</a>`:""}</p>`
+     :`<div class="pviewer"><canvas data-anim="air_squat" data-outfit="${wp.id}" role="img" aria-label="${esc(wp.name[S.lang]||wp.name.ru)}"></canvas></div>
+      <p class="small muted">${t("om_empty")}</p>`}
+    <div class="rowline"><span class="small">${fmt(t("om_wears"),{s:esc(wp.name[S.lang]||wp.name.ru)})}</span><button type="button" class="btn ghost sm" data-product="${wp.id}">${t("om_see")}</button></div></div>`;
+  const cur=OUT.set||(productById(S.outfit)||wp).id;
+  const up=`<div class="card"><span class="eyebrow">#COREoutfit</span><h3>${t("up_t")}</h3><p class="small muted">${t("up_sub")}</p>
+    ${OUT.url?`<img class="story" src="${OUT.url}" alt="${t("up_t")}">`:OUT.busy?`<p class="small muted">…</p>`:""}
+    <label class="btn ${OUT.src?"ghost":""} block filebtn">${OUT.src?t("up_change"):t("up_btn")}<input type="file" accept="image/*" id="outFile" hidden></label>
+    ${OUT.src?`<div class="field"><span class="qlabel">${t("up_set")}</span><div class="swrow">${CONFIG.shop.products.map(p=>`<button type="button" class="sw ${cur===p.id?"on":""}" data-outset="${p.id}" aria-label="${esc(p.name[S.lang]||p.name.ru)}"><i style="background:${p.top}"></i><i style="background:${p.leg}"></i></button>`).join("")}</div></div>
+      <button type="button" class="btn block" data-act="outShare">${t("up_share")}</button>
+      ${CONFIG.whatsapp?`<a class="btn ghost block" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(fmt(t("up_wa_msg"),{n:S.name||""}))}">${t("up_wa")}</a>`:""}
+      <div id="outOut"></div>`:""}
+    <p class="note">${t("up_private")}</p></div>`;
+  const rules=`<div class="card"><h4>${t("up_rules_t")}</h4><ol class="list small">${t("up_rules").map(r=>`<li>${fmt(r,{h,p:cfg.prize})}</li>`).join("")}</ol></div>`;
+  return `<button type="button" class="back" data-act="back">${t("back")}</button>
+  <div class="hero"><span class="eyebrow">CORE. ACTIVEWEAR</span><h1>${t("of_t")}</h1><p class="muted">${t("of_sub")}</p></div>${month}${up}${rules}`;
+}
+async function shareOutfit(btn){
+  const h=HANDLES[S.country]||HANDLES.ve, out=document.getElementById("outOut");
+  if(!OUT.file){btn.disabled=true; await prepOutfit(); btn.disabled=false;}
+  if(OUT.file&&navigator.canShare&&navigator.canShare({files:[OUT.file]})){
+    try{await navigator.share({files:[OUT.file],title:"#COREoutfit",text:h+" #COREoutfit"}); return;}catch(e){ if(e&&e.name==="AbortError") return; }
+  }
+  if(out) out.innerHTML=`<p class="small muted">${t("share_fb")}</p><a class="btn ghost sm" href="https://instagram.com/${h.slice(1)}">${t("share_ig")}</a>`;
+}
+function outfitTile(){
+  return `<button type="button" class="tile wide of-tile" data-nav="outfit"><span class="eyebrow">#COREoutfit · ${t("om_t")}</span><b>${t("of_tile")}</b><small>${t("of_tile_s")}</small></button>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.cymode){S.cycle.mode=b.dataset.cymode; save(); render(); return;}
+  if(b.dataset.meno!=null){const k=dkey(new Date()); S.log[k]=S.log[k]||{}; const a=S.log[k].meno||[], i=+b.dataset.meno;
+    S.log[k].meno=a.includes(i)?a.filter(x=>x!==i):(i===6?[6]:a.filter(x=>x!==6).concat(i)); save(); render(); return;}
+  if(b.dataset.outset){OUT.set=b.dataset.outset; OUT.url=null; OUT.file=null; render(); prepOutfit().then(()=>{if(S.view==="outfit") render();}); return;}
+  if(b.dataset.act==="outShare"){shareOutfit(b); return;}
+});
+document.addEventListener("change",async e=>{
+  const el=e.target;
+  if(el.id==="outFile"&&el.files&&el.files[0]){
+    try{OUT.src=await shrinkTo(el.files[0],1400); OUT.set=OUT.set||(productById(S.outfit)||CONFIG.shop.products[0]).id; OUT.url=null; render(); await prepOutfit();}
+    catch(err){toast(t("up_err"));}
+    if(S.view==="outfit") render();
+  }
+});
+
+
+/* =========================================================
    RENDER
    ========================================================= */
 function render(){
@@ -3674,9 +4043,9 @@ function render(){
     nav.hidden=false;
     if(S.view==="session"&&!S.session) S.view="home";
     if(S.view==="progress"&&!PH.ready&&!PH.loading){PH.loading=true; phLoad().then(()=>{if(S.view==="progress") render();});}
-    html=({home:vHome,session:vSession,progress:vProgress,profile:vProfile,diary:vDiary,abs:vAbs,challenge:vChallenge,plans:vPlans,mobility:vMobility,shop:vShop,product:vProduct}[S.view]||vHome)();
+    html=({home:vHome,session:vSession,progress:vProgress,profile:vProfile,diary:vDiary,abs:vAbs,challenge:vChallenge,plans:vPlans,mobility:vMobility,shop:vShop,product:vProduct,outfit:vOutfit}[S.view]||vHome)();
   }
-  const cur={session:"home",abs:"home",challenge:"home",plans:"home",mobility:"home",shop:"home",product:"home"}[S.view]||S.view;
+  const cur={session:"home",abs:"home",challenge:"home",plans:"home",mobility:"home",shop:"home",product:"home",outfit:"home"}[S.view]||S.view;
   nav.querySelectorAll("[data-nav]").forEach(b=>b.dataset.nav===cur?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
   v.innerHTML=html;
   if(S.view==="admin") renderAdminData();
@@ -3693,7 +4062,7 @@ function applyCode(p){
   if(p.type==="club"){S.unlocked=true; if(p.until>S.clubUntil){S.clubUntil=p.until; S.clubCode=p.code;}}
   if(p.type==="prem"){S.unlocked=true; if(p.until>S.premUntil){S.premUntil=p.until; S.premCode=p.code;} if(p.until>S.clubUntil) S.clubUntil=p.until;}
   if(p.type==="reto"){S.retoCode=p.code;}
-  if(p.type==="plan"){S.goal=p.goal; S.level=p.level; S.place=p.place; S.block=p.block; S.week=1; toast(t("coach_ok"));}
+  if(p.type==="plan"){S.goal=p.goal; S.goals=[p.goal]; S.level=p.level; S.place=p.place; S.block=p.block; S.week=1; toast(t("coach_ok"));}
   save(); return true;
 }
 function finishSession(){
@@ -3754,10 +4123,10 @@ document.addEventListener("click",async e=>{
     const name=b.dataset.ob, val=+b.dataset.v;
     if(name==="country") OB.country=["ve","es","kz"][val];
     else if(name==="place") OB.place=PLACES[val];
-    else if(name==="goal") OB.goal=GOALS[val];
+    else if(name==="goal"){const g=GOALS[val]; OB.goals=OB.goals||[]; OB.goals=OB.goals.includes(g)?OB.goals.filter(x=>x!==g):OB.goals.concat(g); OB.goal=OB.goals[0]||"";}
     else if(name==="level"){S.level=val; save(); render(); return;}
     else if(name==="pplace"){S.place=PLACES[val]; save(); render(); toast(t("places")[val]); return;}
-    else if(name==="pgoal"){S.goal=GOALS[val]; save(); render(); return;}
+    else if(name==="pgoal"){const g=GOALS[val], cur=S.goals||[S.goal]; const nx=cur.includes(g)?cur.filter(x=>x!==g):cur.concat(g); if(!nx.length){toast(t("goal_min")); return;} setGoals(nx); save(); render(); return;}
     else OB.answers[+name.slice(1)-1]=val;
     render(); return;
   }
@@ -3820,7 +4189,7 @@ document.addEventListener("click",async e=>{
     S.contact=document.getElementById("obContact").value.trim();
     if(!S.name||!S.contact||!OB.country||!OB.place||!OB.goal||OB.answers.includes(null)){document.getElementById("obErr").textContent=t("ob_err"); return;}
     const score=OB.answers.reduce((a,x)=>a+x,0);
-    S.level=score<=1?0:score<=4?1:2; S.country=OB.country; S.place=OB.place; S.goal=OB.goal; S.week=1; S.block=1; go("home");
+    S.level=score<=1?0:score<=4?1:2; S.country=OB.country; S.place=OB.place; setGoals(OB.goals||[OB.goal]); S.week=1; S.block=1; go("home");
   }
   if(act==="back"){go(S.view==="plans"&&S.session?"session":"home");}
   if(act==="adminBack") go("home");
@@ -3850,7 +4219,7 @@ document.addEventListener("click",async e=>{
   }
   if(act==="reset"){
     if(!resetArmed){resetArmed=true; render(); return;}
-    const lang=S.lang; S=fresh(); S.lang=lang; OB={answers:[null,null,null],country:"",place:"",goal:""}; resetArmed=false; GATE="welcome"; stopRest();
+    const lang=S.lang; S=fresh(); S.lang=lang; OB={answers:[null,null,null],country:"",place:"",goal:"",goals:[]}; resetArmed=false; GATE="welcome"; stopRest();
     try{localStorage.removeItem(KEY);}catch(err){} render(); window.scrollTo(0,0);
   }
 });
