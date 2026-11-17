@@ -427,6 +427,13 @@ select.input{appearance:none;background-image:linear-gradient(45deg,transparent 
 .wkmini .dots span.on{background:var(--ink)}
 button.link{background:none;border:0;padding:0;font:inherit;text-decoration:underline;color:var(--ink);cursor:pointer}
 .nav button span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+/* catalog */
+.sec-t{margin:22px 0 10px;font-size:22px}
+.product .swrow{gap:6px}
+.g-stage{height:340px}
+.gallery.big .g-stage{height:460px}
+.g-stage img{object-fit:cover;object-position:50% 22%}
 </style>
 </head>
 <body>
@@ -2058,9 +2065,12 @@ function drawViewer(v,now){
   }
   const items=eqList(v.id,an);
   const skin=COL.skin, skinF=front?COL.skin:COL.skin2, leg=OUTF.leg, legF=front?OUTF.leg:OUTF.leg2;
+  const ST=OUTF.style||{top:"bra",leg:"legging"};
+  const sleeveU=["tee","wrap","jacket","sweat","zip"].includes(ST.top), sleeveF=["wrap","jacket","sweat","zip"].includes(ST.top), puffy=ST.top==="jacket"||ST.top==="sweat";
   const drawArm=(n,sk)=>{
-    limb(J["sh"+n],J["e"+n],4.3,4.2,2.8,sk,"ua"+n);
-    limb(J["e"+n],J["h"+n],2.9,3.15,2.0,sk,"fa"+n);
+    const far=sk!==skin, tc=far?tint(OUTF.top,-.12):OUTF.top;
+    limb(J["sh"+n],J["e"+n],puffy?5.4:sleeveU?4.7:4.3,puffy?5.3:sleeveU?4.5:4.2,puffy?4.4:2.8,sleeveU?tc:sk,"ua"+n);
+    limb(J["e"+n],J["h"+n],puffy?4.4:sleeveF?3.2:2.9,puffy?4.4:sleeveF?3.3:3.15,puffy?3.6:2.0,sleeveF?tc:sk,"fa"+n);
     drawHand(J["e"+n],J["h"+n],sk,holding("h"+n),n);
   };
   const holding=jt=>items.some(it=>it.at===jt&&["db","kb","bottle","jug","plate","grip"].includes(it.k))||(/^(push|knee_push|pike|climb|plank|side_plank|bird|chair_dip)/.test(v.id)&&false);
@@ -2083,8 +2093,13 @@ function drawViewer(v,now){
     ctx.lineWidth=1.2*sc; ctx.beginPath(); ctx.moveTo(tsx,tsy); ctx.lineTo(tsx+(ux*.7-nx*.7)*3.2*sc,tsy+(uy*.7-ny*.7)*3.2*sc); ctx.stroke();
   }
   const drawLeg=(n,lg)=>{
-    limb(J["hip"+n],J["k"+n],8.3,8.2,4.4,lg,"th"+n);
-    limb(J["k"+n],J["a"+n],4.6,6.1,2.7,lg,"sh"+n);
+    const L=ST.leg, sk2=lg===leg?skin:skinF;
+    if(L==="wide"){ limb(J["hip"+n],J["k"+n],8.8,8.8,7.4,lg,"th"+n); limb(J["k"+n],J["a"+n],7.2,7.6,8.6,lg,"sh"+n); }
+    else if(L==="flare"){ limb(J["hip"+n],J["k"+n],8.3,8.1,4.4,lg,"th"+n); limb(J["k"+n],J["a"+n],4.6,5.2,7.6,lg,"sh"+n); }
+    else if(L==="jogger"){ limb(J["hip"+n],J["k"+n],8.8,8.6,6.2,lg,"th"+n); limb(J["k"+n],J["a"+n],6,6.2,4,lg,"sh"+n); }
+    else if(L==="short"){ limb(J["hip"+n],J["k"+n],8.3,8.2,4.4,sk2,"th"+n); limb(J["k"+n],J["a"+n],4.6,6.1,2.7,sk2,"sh"+n);
+      const a=J["hip"+n], k=J["k"+n]; limb(a,[a[0]+(k[0]-a[0])*.55,a[1]+(k[1]-a[1])*.55],8.6,8.4,7.6,lg,"th"+n); }
+    else { limb(J["hip"+n],J["k"+n],8.3,8.2,4.4,lg,"th"+n); limb(J["k"+n],J["a"+n],4.6,6.1,2.7,lg,"sh"+n); }
     drawShoe(J["a"+n],J["f"+n]);
   };
   function drawShoe(an_,ft){
@@ -2125,7 +2140,8 @@ function drawViewer(v,now){
     fillShape(outline(0,1),skin);
     fillShape(outline(0,.3),leg);
     ell(0,front?0:1.6,front?12:9.6,front?7:7.2,tint(leg,.04));
-    fillShape(outline(.52,1),OUTF.top);
+    const t0={bra:.52,tank:.44,tee:.44,wrap:.47,jacket:.3,sweat:.3,zip:.33,leo:.26}[(OUTF.style||{}).top]||.52;
+    fillShape(outline(t0,1),OUTF.top);
     ell(1,front?0:.6,front?13:7,5.4,OUTF.top);
     // "core." on the waistband
     if(sc>.7){const q=at(.24), c0=X(add(q.p,q.back,front?0:-1.2)); let ang=Math.atan2(q.back[1],q.back[0]); if(ang>Math.PI/2||ang<-Math.PI/2) ang+=Math.PI;
@@ -2752,7 +2768,7 @@ const productById=id=>CONFIG.shop.products.find(p=>p.id===id)||CONFIG.shop.produ
 function outfit(id){
   const p=productById(id||S.outfit);
   const lum=h=>{const n=parseInt(h.slice(1),16); return (0.299*(n>>16)+0.587*(n>>8&255)+0.114*(n&255))/255;};
-  return {top:p.top, top2:tint(p.top,.15), leg:p.leg, leg2:tint(p.leg,lum(p.leg)>.5?-.18:.22), light:lum(p.leg)>.55};
+  return {top:p.top, top2:tint(p.top,.15), leg:p.leg, leg2:tint(p.leg,lum(p.leg)>.5?-.18:.22), light:lum(p.leg)>.55, style:p.style};
 }
 function shopLinks(p){
   const c=S.country||"kz", h=HANDLES[c]||HANDLES.ve, name=p.name[S.lang];
@@ -4007,7 +4023,7 @@ function outfitParts(){
   const up=`<div class="card"><span class="eyebrow">#COREoutfit</span><h3>${t("up_t")}</h3><p class="small muted">${t("up_sub")}</p>
     ${OUT.url?`<img class="story" src="${OUT.url}" alt="${t("up_t")}">`:OUT.busy?`<p class="small muted">…</p>`:""}
     <label class="btn ${OUT.src?"ghost":""} block filebtn">${OUT.src?t("up_change"):t("up_btn")}<input type="file" accept="image/*" id="outFile" hidden></label>
-    ${OUT.src?`<div class="field"><span class="qlabel">${t("up_set")}</span><div class="swrow">${CONFIG.shop.products.map(p=>`<button type="button" class="sw ${cur===p.id?"on":""}" data-outset="${p.id}" aria-label="${esc(p.name[S.lang]||p.name.ru)}"><i style="background:${p.top}"></i><i style="background:${p.leg}"></i></button>`).join("")}</div></div>
+    ${OUT.src?`<div class="field"><span class="qlabel">${t("up_set")}</span><div class="swrow">${CONFIG.shop.products.filter(p=>p.wear!==false).map(p=>`<button type="button" class="sw ${cur===p.id?"on":""}" data-outset="${p.id}" aria-label="${esc(p.name[S.lang]||p.name.ru)}"><i style="background:${p.top}"></i><i style="background:${p.leg}"></i></button>`).join("")}</div></div>
       <button type="button" class="btn block" data-act="outShare">${t("up_share")}</button>
       ${CONFIG.whatsapp?`<a class="btn ghost block" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(fmt(t("up_wa_msg"),{n:S.name||""}))}">${t("up_wa")}</a>`:""}
       <div id="outOut"></div>`:""}
@@ -4233,6 +4249,204 @@ document.addEventListener("click",e=>{
 });
 document.addEventListener("change",e=>{
   if(e.target.id==="rmTime"&&e.target.value){S.remind=S.remind||{}; S.remind.time=e.target.value; save();}
+});
+
+
+/* =========================================================
+   REAL CORE CATALOG (Nov 2026): models with colour variants,
+   real photos in img/, sizes S and M. Prices: add per country.
+   ========================================================= */
+const COLN={
+  negro:{es:"Negro",en:"Black",ru:"Чёрный",kk:"Қара"},
+  beige:{es:"Beige",en:"Beige",ru:"Бежевый",kk:"Беж"},
+  choco:{es:"Chocolate",en:"Chocolate",ru:"Шоколад",kk:"Шоколад"},
+  burdeos:{es:"Burdeos",en:"Burgundy",ru:"Бордовый",kk:"Қызыл күрең"},
+  cherry:{es:"Cherry",en:"Cherry",ru:"Вишня",kk:"Шие"},
+  ciruela:{es:"Ciruela",en:"Plum",ru:"Слива",kk:"Қара өрік"},
+  rosa:{es:"Rosa nude",en:"Nude pink",ru:"Пудровый",kk:"Ақшыл қызғылт"},
+  malva:{es:"Malva",en:"Mauve",ru:"Лиловый",kk:"Күлгін"},
+  chocobeige:{es:"Chocolate y beige",en:"Chocolate & beige",ru:"Шоколад и беж",kk:"Шоколад пен беж"},
+  natural:{es:"Natural",en:"Natural",ru:"Натуральный",kk:"Табиғи"}
+};
+const L4=(es,en,ru,kk)=>({es,en,ru,kk});
+const CATALOG=[
+ {id:"wine",name:"Wine Set",style:{top:"bra",leg:"flare"},
+  desc:L4("Top con copas removibles y leggings acampanados de tiro alto con control de abdomen, en un burdeos que favorece a cualquier tono de piel.",
+          "Top with removable cups and high-waisted flared leggings with tummy control, in a burgundy that flatters every skin tone.",
+          "Топ со съёмными чашками и расклешённые леггинсы с высокой посадкой и утягивающим эффектом. Бордовый цвет, который идёт любому тону кожи.",
+          "Алынбалы кеселері бар топ және ішті тартып тұратын, белі биік кең балақ леггинс. Кез келген тері түсіне жарасатын қызыл күрең."),
+  feat:L4(["Control de abdomen","Copas removibles","Pierna acampanada"],["Tummy control","Removable cups","Flared leg"],["Утягивающий эффект","Съёмные чашки","Клёш от колена"],["Ішті тартады","Алынбалы кеселер","Кең балақ"]),
+  variants:[{c:"burdeos",top:"#6A1D2A",leg:"#6A1D2A",photos:["img/wine-1.jpg","img/wine-wrap-1.jpg"]}]},
+ {id:"lounge",name:"Set Lounge",style:{top:"tank",leg:"wide"},
+  desc:L4("Top de tirantes con escote cuadrado y pantalón ancho de felpa con cordón y costura frontal. Del gym al café sin cambiarte.",
+          "Square-neck tank and wide-leg drawstring trousers with a front pintuck. From the gym to coffee without changing.",
+          "Майка с квадратным вырезом и широкие брюки на кулиске со стрелкой. Из зала в кафе без переодевания.",
+          "Төртбұрыш ойындысы бар майка және бауы бар кең шалбар. Залдан кафеге киім ауыстырмай."),
+  feat:L4(["Escote cuadrado","Pantalón ancho con cordón","Logo core. bordado"],["Square neckline","Wide drawstring trousers","Embroidered core. logo"],["Квадратный вырез","Широкие брюки на кулиске","Вышитый логотип core."],["Төртбұрыш ойынды","Бауы бар кең шалбар","Кестеленген core. логотипі"]),
+  variants:[{c:"negro",top:"#1C1A19",leg:"#1C1A19",photos:["img/lounge-negro-1.jpg","img/lounge-trio-1.jpg","img/lounge-trio-3.jpg"]},
+            {c:"beige",top:"#D9CAB6",leg:"#D3C2AC",photos:["img/lounge-beige-1.jpg","img/lounge-trio-2.jpg"]},
+            {c:"choco",top:"#6B3A25",leg:"#6E3C27",photos:["img/lounge-choco-1.jpg"]}]},
+ {id:"cherry",name:"Cherry Set",style:{top:"bra",leg:"legging"},
+  desc:L4("Top y leggings de tiro alto en tono cherry con ribete blanco que estiliza la silueta. Pensado para entrenar y lucirlo.",
+          "Top and high-waisted leggings in cherry with a white piping that sculpts your silhouette. Made to train and to show off.",
+          "Топ и леггинсы с высокой посадкой цвета вишни с белым кантом, который подчёркивает силуэт.",
+          "Ақ жиегі бар шие түсті топ пен белі биік леггинс, силуэтті әдемі көрсетеді."),
+  feat:L4(["Ribete blanco en contraste","Tiro alto que realza","Sujeción media"],["Contrast white piping","Lifting high waist","Medium support"],["Контрастный белый кант","Высокая посадка с эффектом пуш-ап","Средняя поддержка"],["Ақ контраст жиек","Көтеріп тұратын биік бел","Орташа тірек"]),
+  variants:[{c:"cherry",top:"#6B1C22",leg:"#6B1C22",photos:["img/cherry-1.jpg","img/cherry-2.jpg","img/cherry-3.jpg"]}]},
+ {id:"openback",name:"Set Open Back",style:{top:"tee",leg:"wide"},src:1,
+  desc:L4("Camiseta crop de manga corta con espalda abierta y pantalón ancho de tiro alto, elástico en 4 direcciones. Ideal para yoga y pilates.",
+          "Open-back short-sleeve crop tee and high-waisted wide-leg trousers with 4-way stretch. Ideal for yoga and Pilates.",
+          "Укороченная футболка с открытой спиной и широкие брюки с высокой посадкой, тянутся в 4 стороны. Для йоги и пилатеса.",
+          "Арқасы ашық қысқа футболка және белі биік кең шалбар, 4 бағытта созылады. Йога мен пилатеске арналған."),
+  feat:L4(["Espalda abierta","Secado rápido","Elástico en 4 direcciones"],["Open back","Quick-dry","4-way stretch"],["Открытая спина","Быстро сохнет","Тянется в 4 стороны"],["Ашық арқа","Тез кебеді","4 бағытта созылады"]),
+  fabric:L4("78 % nailon, 22 % elastano","78% nylon, 22% spandex","78 % нейлон, 22 % спандекс","78 % нейлон, 22 % спандекс"),
+  variants:[{c:"ciruela",top:"#4B2232",leg:"#4B2232",photos:["img/openback-1.jpg"]},{c:"rosa",top:"#EFD8CF",leg:"#ECD3C9",photos:["img/openback-1.jpg"]}]},
+ {id:"halfzip",name:"Core Jacket",style:{top:"sweat",leg:"jogger"},
+  desc:L4("Sudadera oversize de media cremallera con cuello alto y jogger a juego con costura frontal. El conjunto para antes y después de entrenar.",
+          "Oversized half-zip sweatshirt with a high collar and matching joggers with a front seam. Your before-and-after-training set.",
+          "Оверсайз-худи на молнии с высоким воротом и джоггеры в тон. Комплект до и после тренировки.",
+          "Жағасы биік, жартылай сыдырмалы оверсайз свитшот және сәйкес джоггер. Жаттығу алдында және кейін киюге."),
+  feat:L4(["Cremallera XL","Felpa suave por dentro","Jogger a juego"],["XL zip","Soft brushed inside","Matching joggers"],["Крупная молния","Мягкий начёс внутри","Джоггеры в комплекте"],["Үлкен сыдырма","Іші жұмсақ","Сәйкес джоггер"]),
+  variants:[{c:"negro",top:"#1B1A19",leg:"#1F1D1C",photos:["img/halfzip-1.jpg","img/halfzip-2.jpg","img/halfzip-3.jpg","img/halfzip-flat.jpg"]}]},
+ {id:"cropzip",name:"Crop Jacket + Biker",style:{top:"jacket",leg:"short"},
+  desc:L4("Chaqueta corta de felpa con cremallera y cordón en el bajo, con biker short de tiro alto. Comodidad con estilo.",
+          "Cropped zip-up fleece jacket with a drawstring hem, paired with high-waisted biker shorts.",
+          "Укороченная куртка на молнии с кулиской по низу и байкеры с высокой посадкой.",
+          "Етегі бауланатын қысқа сыдырмалы күрте және белі биік байкер шорт."),
+  feat:L4(["Bajo ajustable con cordón","Puños elásticos","Biker de tiro alto"],["Adjustable drawstring hem","Elastic cuffs","High-waisted biker shorts"],["Регулируемый низ","Резинка на манжетах","Байкеры с высокой посадкой"],["Реттелетін етек","Серпімді жең ұшы","Белі биік байкер"]),
+  variants:[{c:"chocobeige",top:"#5B3322",leg:"#B8A58C",photos:["img/cropzip-1.jpg"]}]},
+ {id:"polo",name:"Polo Sweater",style:{top:"sweat",leg:"legging"},
+  desc:L4("Sudadera crop con cuello polo y botones, en malva. Combínala con tus leggings CORE.",
+          "Cropped polo-collar sweatshirt with buttons, in mauve. Pair it with your CORE leggings.",
+          "Укороченный свитшот с воротником-поло на пуговицах, лиловый. Сочетайте с леггинсами CORE.",
+          "Түймелі поло жағалы қысқа свитшот, күлгін. CORE леггинсімен киіңіз."),
+  feat:L4(["Cuello polo","Corte crop","Tejido grueso y suave"],["Polo collar","Cropped fit","Thick, soft fabric"],["Воротник-поло","Укороченный крой","Плотная мягкая ткань"],["Поло жаға","Қысқа пішім","Қалың жұмсақ мата"]),
+  variants:[{c:"malva",top:"#CDB3B4",leg:"#3B2733",photos:["img/polo-1.jpg"]}]},
+ {id:"wrap",name:"Wrap Top Pilates",style:{top:"wrap",leg:"flare"},src:1,
+  desc:L4("Top cruzado de manga larga con lazada y agujeros para los pulgares. Queda perfecto sobre el Wine Set para pilates y ballet fit.",
+          "Long-sleeve wrap top that ties at the front, with thumb holes. Perfect over the Wine Set for Pilates and barre.",
+          "Топ с запахом и длинным рукавом, завязкой и отверстиями для больших пальцев. Идеален поверх Wine Set для пилатеса.",
+          "Ұзын жеңді, байланатын орама топ, бас бармаққа арналған тесігі бар. Пилатеске Wine Set үстінен киюге тамаша."),
+  feat:L4(["Escote en V cruzado","Agujeros para pulgares","Lazada ajustable"],["Crossover V-neck","Thumb holes","Adjustable tie"],["V-образный запах","Отверстия для пальцев","Регулируемая завязка"],["V тәрізді орама","Бармақ тесігі","Реттелетін бау"]),
+  fabric:L4("95 % rayón, 5 % elastano","95% rayon, 5% spandex","95 % вискоза, 5 % спандекс","95 % вискоза, 5 % спандекс"),
+  variants:[{c:"negro",top:"#1C1A19",leg:"#6A1D2A",photos:["img/wine-wrap-1.jpg"]}]},
+ {id:"jumpsuit",name:"Jumpsuit Flare",style:{top:"leo",leg:"flare"},src:1,
+  desc:L4("Mono sin mangas con escote en U, espalda baja, copas removibles y pierna acampanada. Tejido grueso que no transparenta.",
+          "Sleeveless jumpsuit with a plunging U-neck, low back, removable cups and flared legs. Thick, squat-proof fabric.",
+          "Комбинезон без рукавов с глубоким U-вырезом, открытой спиной, съёмными чашками и клёшем. Плотная непрозрачная ткань.",
+          "Жеңсіз, терең U ойындысы бар, арқасы ашық комбинезон: алынбалы кеселер және кең балақ. Қалың, мөлдір емес мата."),
+  feat:L4(["Copas removibles","No transparenta","Pierna acampanada"],["Removable cups","Squat-proof","Flared leg"],["Съёмные чашки","Не просвечивает","Клёш"],["Алынбалы кеселер","Мөлдір емес","Кең балақ"]),
+  fabric:L4("78 % nailon, 22 % elastano","78% nylon, 22% spandex","78 % нейлон, 22 % спандекс","78 % нейлон, 22 % спандекс"),
+  variants:[{c:"negro",top:"#1C1A19",leg:"#1C1A19",photos:[]}]},
+ {id:"tennis",name:"Set Tennis 3 piezas",style:{top:"bra",leg:"legging"},src:1,
+  desc:L4("Top bicolor con espalda abierta y copas removibles, leggings de tiro alto y falda con short interior y bolsillo. Para pádel, tenis y gym.",
+          "Two-tone open-back bra with removable pads, high-waisted leggings and a lined skirt with a pocket. For padel, tennis and the gym.",
+          "Двухцветный топ с открытой спиной и съёмными чашками, леггинсы с высокой посадкой и юбка с шортами и карманом. Для падела, тенниса и зала.",
+          "Арқасы ашық екі түсті топ, белі биік леггинс және іші шорт, қалталы юбка. Падел, теннис және залға."),
+  feat:L4(["3 piezas","Falda con short interior","Copas removibles"],["3 pieces","Skirt with built-in shorts","Removable pads"],["3 предмета","Юбка с шортами внутри","Съёмные чашки"],["3 бөлік","Іші шорт юбка","Алынбалы кеселер"]),
+  fabric:L4("75 % nailon, 25 % elastano","75% nylon, 25% spandex","75 % нейлон, 25 % спандекс","75 % нейлон, 25 % спандекс"),
+  variants:[{c:"negro",top:"#F1EAE0",leg:"#1C1A19",photos:[]}]},
+ {id:"zipjkt",name:"Seamless Zip Jacket",style:{top:"zip",leg:"legging"},src:1,
+  desc:L4("Chaqueta sin costuras, entallada, con cremallera completa, cuello alto y agujeros para los pulgares. No transparenta.",
+          "Slim-fit seamless full-zip jacket with a stand collar and thumb holes. Non-see-through.",
+          "Бесшовная приталенная куртка на молнии со стойкой и отверстиями для пальцев. Не просвечивает.",
+          "Тігіссіз, денеге қонымды, тік жағалы, толық сыдырмалы күрте, бармақ тесіктері бар."),
+  feat:L4(["Sin costuras","Agujeros para pulgares","Bajo curvo"],["Seamless","Thumb holes","Curved hem"],["Бесшовная","Отверстия для пальцев","Закруглённый низ"],["Тігіссіз","Бармақ тесігі","Доғал етек"]),
+  fabric:L4("90 % nailon, 10 % elastano","90% nylon, 10% spandex","90 % нейлон, 10 % спандекс","90 % нейлон, 10 % спандекс"),
+  variants:[{c:"negro",top:"#1C1A19",leg:"#1C1A19",photos:[]}]},
+ {id:"track",name:"Track Jacket Retro",style:{top:"jacket",leg:"legging"},src:1,
+  desc:L4("Chaqueta deportiva retro de corte relajado con franjas en contraste, cuello alto y puños elásticos.",
+          "Relaxed retro track jacket with contrast stripes, stand collar and elastic cuffs.",
+          "Ретро-олимпийка свободного кроя с контрастными полосками, стойкой и манжетами на резинке.",
+          "Контраст жолақтары бар, тік жағалы, еркін пішімді ретро спорт күрте."),
+  feat:L4(["Franjas en contraste","Corte relajado","Ligera y elástica"],["Contrast stripes","Relaxed fit","Light and stretchy"],["Контрастные полосы","Свободный крой","Лёгкая и тянущаяся"],["Контраст жолақтар","Еркін пішім","Жеңіл әрі созылмалы"]),
+  fabric:L4("82,5 % poliéster, 17,5 % elastano","82.5% polyester, 17.5% spandex","82,5 % полиэстер, 17,5 % спандекс","82,5 % полиэстер, 17,5 % спандекс"),
+  variants:[{c:"negro",top:"#232120",leg:"#1C1A19",photos:[]}]},
+ {id:"tote",name:"Tote Bag CORE",acc:true,
+  desc:L4("Bolsa de lona con asas de color chocolate y cinta «girl, do it for you!». Para el gym, la playa o el día a día.",
+          "Canvas tote with chocolate handles and a “girl, do it for you!” ribbon. For the gym, the beach or every day.",
+          "Холщовая сумка с шоколадными ручками и лентой «girl, do it for you!». Для зала, пляжа и каждого дня.",
+          "Шоколад түсті тұтқалары және «girl, do it for you!» таспасы бар кенеп сөмке."),
+  feat:L4(["Lona resistente","Asas reforzadas","Cinta con eslogan"],["Sturdy canvas","Reinforced handles","Slogan ribbon"],["Плотный холст","Усиленные ручки","Лента со слоганом"],["Берік кенеп","Бекітілген тұтқалар","Ұранды таспа"]),
+  variants:[{c:"natural",top:"#E8DCC8",leg:"#6B4A33",photos:["img/tote-1.jpg"]}]}
+];
+const SIZES_AVAIL=["S","M"];
+CONFIG.shop.products=[]; CONFIG.shop.groups=CATALOG;
+CATALOG.forEach(g=>g.variants.forEach(v=>{
+  const name={}; ["es","en","ru","kk"].forEach(l=>name[l]=`${g.name} · ${COLN[v.c][l]}`);
+  CONFIG.shop.products.push({id:`${g.id}-${v.c}`,group:g.id,name,cname:COLN[v.c],top:v.top,leg:v.leg,style:g.style,wear:!g.acc,acc:!!g.acc,
+    photos:v.photos,price:{kz:"",ve:"",es:""},url:"",kaspi:"",
+    info:{desc:g.desc,feat:g.feat,fabric:g.fabric||null,sizes:g.acc?[]:SIZES_AVAIL}});
+}));
+CONFIG.shop.bestseller="wine-burdeos";
+CONFIG.outfit.set="lounge-negro";
+if(!CONFIG.shop.products.some(p=>p.id===S.outfit&&p.wear)) S.outfit="lounge-negro";
+const groupOf=p=>CATALOG.find(g=>g.id===p.group);
+const variantsOf=p=>CONFIG.shop.products.filter(q=>q.group===p.group);
+const pName=p=>p.name[S.lang]||p.name.es;
+
+const CAT_T={
+ es:{sizes_av:"Tallas disponibles",acc_t:"Accesorios",price_ask:"Precio: escríbenos",shop_sub:"Los sets reales de CORE. Mira las fotos, elige color y pruébaselo a la chica de la app.",one_size:"Talla única",wear_none:"Accesorio"},
+ en:{sizes_av:"Available sizes",acc_t:"Accessories",price_ask:"Price: message us",shop_sub:"The real CORE sets. See the photos, pick a colour and try it on the girl in the app.",one_size:"One size",wear_none:"Accessory"},
+ ru:{sizes_av:"Доступные размеры",acc_t:"Аксессуары",price_ask:"Цена: напишите нам",shop_sub:"Настоящие комплекты CORE. Смотрите фото, выбирайте цвет и примеряйте на девушке из приложения.",one_size:"Единый размер",wear_none:"Аксессуар"},
+ kk:{sizes_av:"Қолжетімді өлшемдер",acc_t:"Аксессуарлар",price_ask:"Бағасы: бізге жазыңыз",shop_sub:"CORE-дың нағыз жиынтықтары. Фотоларды қарап, түсін таңдап, қолданбадағы қызға кигізіп көріңіз.",one_size:"Бір өлшем",wear_none:"Аксессуар"}
+};
+for(const l in CAT_T) if(T[l]) Object.assign(T[l],CAT_T[l]);
+
+/* gallery: real photos first, then the animation; 360° only while a set has no photos */
+const GV={}; // group id → selected variant id
+function slidesOf(p){
+  const ph=(p.photos||[]).map(src=>({k:"img",src}));
+  if(!p.wear) return ph;
+  return [...ph,{k:"anim"},...(ph.length?[]:[{k:"spin"}])];
+}
+function priceLine(p,cls){const c=S.country||"kz"; return p.price&&p.price[c]?`<p class="${cls}">${esc(p.price[c])}</p>`:`<p class="small muted" style="margin:4px 0 8px">${t("price_ask")}</p>`;}
+function swatch(q,on,attr){return `<button type="button" class="sw ${on?"on":""}" ${attr}="${q.id}" aria-label="${esc(q.cname[S.lang]||q.cname.es)}" title="${esc(q.cname[S.lang]||q.cname.es)}"><i style="background:${q.top}"></i><i style="background:${q.leg}"></i></button>`;}
+function shopCard(g){
+  const vs=CONFIG.shop.products.filter(q=>q.group===g.id), p=vs.find(q=>q.id===GV[g.id])||vs[0], cur=S.outfit, best=CONFIG.shop.bestseller;
+  return `<div class="card product">
+    ${vs.some(q=>q.id===best)?`<span class="ribbon">${t("best_btn")}</span>`:""}
+    ${gallery(p)}
+    <div class="rowline"><div><h3>${esc(g.name)}</h3><p class="small muted" style="margin:2px 0 0">${esc(p.cname[S.lang]||p.cname.es)}${p.acc?"":" · "+SIZES_AVAIL.join(" / ")}</p></div>
+      ${vs.length>1?`<div class="swrow">${vs.map(q=>swatch(q,q.id===p.id,"data-gv")).join("")}</div>`:`<span class="swatches"><i style="background:${p.top}"></i><i style="background:${p.leg}"></i></span>`}</div>
+    ${priceLine(p,"price-sm")}
+    <div class="inline">${p.wear?`<button type="button" class="btn ${cur===p.id?"":"ghost"} sm" data-outfit-set="${p.id}">${cur===p.id?"✓ "+t("shop_wearing"):t("shop_wear")}</button>`:""}
+      <button type="button" class="btn ghost sm" data-product="${p.id}">${t("see_detail")}</button></div>
+  </div>`;
+}
+function vShop(){
+  const best=CONFIG.shop.bestseller, sets=CATALOG.filter(g=>!g.acc), acc=CATALOG.filter(g=>g.acc);
+  return `<div class="hero"><span class="eyebrow">core. activewear</span><h1>${t("shop_t")}</h1><p class="muted">${t("shop_sub")}</p>
+    <div class="chips"><button type="button" class="chip best" data-product="${best}">${t("best_btn")}</button><button type="button" class="chip plain" data-act="toOutfit">#COREoutfit</button></div></div>
+  ${sets.map(shopCard).join("")}
+  ${acc.length?`<h2 class="sec-t">${t("acc_t")}</h2>${acc.map(shopCard).join("")}`:""}
+  ${outfitSection()}`;
+}
+function vProduct(){
+  const p=productById(PID||CONFIG.shop.bestseller), g=groupOf(p), info=p.info, isBest=p.id===CONFIG.shop.bestseller, vs=variantsOf(p), on=S.outfit===p.id;
+  return `<button type="button" class="back" data-act="backShop">${t("back")}</button>
+  ${isBest?`<div class="hero"><span class="eyebrow">${t("best_btn")}</span><h1>${t("best_t")}</h1><p class="muted">${t("best_sub")}</p></div>`:""}
+  <div class="card product">
+    ${gallery(p,true)}
+    <div class="rowline"><h2>${esc(g.name)}</h2>${isBest?`<span class="chip dark">${t("best_btn")}</span>`:""}</div>
+    ${priceLine(p,"price")}
+    <p class="small">${esc(info.desc[S.lang]||info.desc.es)}</p>
+    <div class="field"><span class="qlabel">${t("colors")}: ${esc(p.cname[S.lang]||p.cname.es)}</span><div class="swrow">${vs.map(q=>swatch(q,q.id===p.id,"data-product")).join("")}</div></div>
+    <div class="field"><span class="qlabel">${t("sizes_av")}</span><div class="chips">${info.sizes.length?info.sizes.map(s=>`<span class="chip">${s}</span>`).join(""):`<span class="chip plain">${t("one_size")}</span>`}</div></div>
+    <div class="field"><span class="qlabel">${t("details")}</span><ul class="list small">${(info.feat[S.lang]||info.feat.es).map(x=>`<li>${esc(x)}</li>`).join("")}${info.fabric?`<li>${t("fabric")}: ${esc(info.fabric[S.lang]||info.fabric.es)}</li>`:""}</ul></div>
+    <div class="inline">${p.wear?`<button type="button" class="btn ${on?"":"ghost"} sm" data-outfit-set="${p.id}">${on?"✓ "+t("shop_wearing"):t("shop_wear")}</button>`:""}${shopLinks(p)}</div>
+  </div>`;
+}
+function shopStrip(){
+  const cur=productById(S.outfit), best=productById(CONFIG.shop.bestseller), vs=variantsOf(cur);
+  return `<div class="card shopstrip"><div class="rowline"><div><span class="eyebrow">${t("shop_strip")}</span><h3>${esc(pName(cur))}</h3></div>
+    <button type="button" class="btn sm" data-nav="shop">${t("shop_see")}</button></div>
+    <button type="button" class="best-btn" data-product="${best.id}"><span>${t("best_btn")}</span><small>${esc(pName(best))}</small><b>›</b></button>
+    ${vs.length>1?`<div class="swrow">${vs.map(q=>swatch(q,q.id===cur.id,"data-outfit-set")).join("")}</div>`:""}</div>`;
+}
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b||!b.dataset.gv) return;
+  const p=productById(b.dataset.gv); GV[p.group]=p.id; GAL[p.id]=0; render();
 });
 
 
