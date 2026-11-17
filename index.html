@@ -437,6 +437,12 @@ button.link{background:none;border:0;padding:0;font:inherit;text-decoration:unde
 .g-stage{height:340px}
 .gallery.big .g-stage{height:460px}
 .g-stage img{object-fit:cover;object-position:50% 22%}
+
+.pdet{border-top:1px solid var(--line);padding:10px 0}
+.pdet summary{cursor:pointer;font-family:var(--font-label);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;list-style:none;display:flex;justify-content:space-between}
+.pdet summary::after{content:"+";font-size:16px}
+.pdet[open] summary::after{content:"–"}
+.pdet .list{margin:8px 0 0}
 </style>
 </head>
 <body>
@@ -4389,6 +4395,50 @@ const CATALOG=[
   feat:L4(["Lona resistente","Asas reforzadas","Cinta con eslogan"],["Sturdy canvas","Reinforced handles","Slogan ribbon"],["Плотный холст","Усиленные ручки","Лента со слоганом"],["Берік кенеп","Бекітілген тұтқалар","Ұранды таспа"]),
   variants:[{c:"natural",top:"#E8DCC8",leg:"#6B4A33",photos:["img/tote-1.jpg"]}]}
 ];
+/* ---- Current stock (Nov 2026): supplier details from the product sheets ---- */
+const DET={
+ lounge:{now:1,model:"MC8933PA",
+  comp:L4([["Top","78 % nailon, 22 % elastano"],["Pantalón","83 % algodón, 17 % poliéster"]],[["Top","78% nylon, 22% spandex"],["Trousers","83% cotton, 17% polyester"]],[["Топ","78 % нейлон, 22 % спандекс"],["Брюки","83 % хлопок, 17 % полиэстер"]],[["Топ","78 % нейлон, 22 % спандекс"],["Шалбар","83 % мақта, 17 % полиэстер"]]),
+  build:L4(["Top con escote cuadrado y espalda en U","Copas removibles","Pantalón ancho de pierna recta con costura delantera","2 bolsillos laterales","Cintura elástica con cordón ajustable","Tiro medio, holgado en la pierna"],
+           ["Square-neck top with a U-back","Removable cups","Straight wide-leg trousers with a front seam","2 side pockets","Elastic waist with adjustable drawstring","Mid-rise, relaxed through the leg"],
+           ["Топ с квадратным вырезом и U-образной спиной","Съёмные чашки","Прямые широкие брюки со стрелкой","2 боковых кармана","Эластичный пояс с регулируемой кулиской","Средняя посадка, свободные по ноге"],
+           ["Төртбұрыш ойынды, арқасы U тәрізді топ","Алынбалы кеселер","Алдыңғы тігісі бар түзу кең шалбар","2 бүйір қалта","Реттелетін бауы бар серпімді бел","Орташа бел, аяғы еркін"])},
+ openback:{now:1,model:"MC91229PD",name:"Eclipse Set",
+  comp:L4([["Set","78 % nailon, 22 % elastano"]],[["Set","78% nylon, 22% spandex"]],[["Комплект","78 % нейлон, 22 % спандекс"]],[["Жиынтық","78 % нейлон, 22 % спандекс"]]),
+  build:L4(["Camiseta crop de manga corta con espalda abierta y escote redondo discreto","Top sin copas","Pantalón ancho de tiro alto, sin costura delantera","Efecto realce de glúteo y cintura que estiliza","Tejido «naked soft», elástico en 4 direcciones"],
+           ["Open-back short-sleeve crop tee with a modest scoop neck","Top without pads","High-waisted wide-leg trousers with a seamless front","Lifting effect and sculpting waistband","“Naked soft” fabric with 4-way stretch"],
+           ["Укороченная футболка с открытой спиной и аккуратным круглым вырезом","Топ без чашек","Широкие брюки с высокой посадкой без переднего шва","Эффект пуш-ап и утягивающий пояс","Ткань «naked soft», тянется в 4 стороны"],
+           ["Арқасы ашық, жұмсақ дөңгелек ойынды қысқа футболка","Кеселері жоқ топ","Алды тігіссіз, белі биік кең шалбар","Бөксені көтеретін, белді тартатын әсер","«Naked soft» мата, 4 бағытта созылады"])},
+ tennis:{now:1,model:"MC5260",name:"Umay Set",
+  comp:L4([["Set","75 % nailon, 25 % elastano"]],[["Set","75% nylon, 25% spandex"]],[["Комплект","75 % нейлон, 25 % спандекс"]],[["Жиынтық","75 % нейлон, 25 % спандекс"]]),
+  build:L4(["Top con escote cuadrado, espalda abierta y tirantes anchos","Costuras en bloques de color y copas removibles","Leggings de tiro alto con cintura plisada","Falda en A con volante, short interior y bolsillo lateral"],
+           ["Square-neck open-back bra with wide straps","Colour-block seams and removable pads","High-waisted leggings with a pleated waistband","A-line ruffle skirt with built-in shorts and a side pocket"],
+           ["Топ с квадратным вырезом, открытой спиной и широкими бретелями","Цветные вставки и съёмные чашки","Леггинсы с высокой посадкой и плиссированным поясом","Юбка-трапеция с воланом, шортами и боковым карманом"],
+           ["Төртбұрыш ойынды, арқасы ашық, иық баулары кең топ","Түсті блоктар мен алынбалы кеселер","Белі биік, бүрмелі белдікті леггинс","Іші шорт, бүйір қалтасы бар волан юбка"])},
+ jumpsuit:{now:1,model:"MC15324",name:"Uva Set",set:true,
+  comp:L4([["Mono","78 % nailon, 22 % elastano"]],[["Jumpsuit","78% nylon, 22% spandex"]],[["Комбинезон","78 % нейлон, 22 % спандекс"]],[["Комбинезон","78 % нейлон, 22 % спандекс"]]),
+  build:L4(["Escote en U profundo con doble tirante","Espalda baja en U","Copas removibles (sujetador integrado)","Pierna acampanada","Tejido grueso a prueba de sentadillas, no transparenta"],
+           ["Plunging U-neck with double straps","Low U-back","Removable cups (built-in bra)","Flared leg","Thick, squat-proof, non-see-through fabric"],
+           ["Глубокий U-вырез с двойными бретелями","Низкая U-образная спина","Съёмные чашки (встроенный бра)","Клёш","Плотная ткань, не просвечивает в приседе"],
+           ["Қос баулы терең U ойынды","Арқасы төмен U тәрізді","Алынбалы кеселер (кірістірілген бра)","Кең балақ","Қалың, отырғанда мөлдірленбейтін мата"])},
+ wrap:{now:1,model:"MC3101",
+  comp:L4([["Top","95 % rayón, 5 % elastano"]],[["Top","95% rayon, 5% spandex"]],[["Топ","95 % вискоза, 5 % спандекс"]],[["Топ","95 % вискоза, 5 % спандекс"]]),
+  build:L4(["Manga larga con agujeros para los pulgares","Escote en V profundo, delantero cruzado","Cintas largas para atarlo de varias formas","Corte crop y ajustado","Tejido ligero, suave y elástico en 4 direcciones"],
+           ["Long sleeves with thumb holes","Deep V-neck, crossover front","Long ties to wear it several ways","Cropped, slim fit","Light, soft fabric with 4-way stretch"],
+           ["Длинный рукав с отверстиями для пальцев","Глубокий V-вырез, запах спереди","Длинные завязки — можно носить по-разному","Укороченный приталенный крой","Лёгкая мягкая ткань, тянется в 4 стороны"],
+           ["Бармақ тесігі бар ұзын жең","Терең V ойынды, алды айқастырылған","Әртүрлі байлауға арналған ұзын баулар","Қысқа, денеге қонымды","Жеңіл, жұмсақ, 4 бағытта созылатын мата"])},
+ zipjkt:{now:1,model:"MC6703J",name:"Rashguard",
+  comp:L4([["Chaqueta","90 % nailon, 10 % elastano (tejido sin costuras)"]],[["Jacket","90% nylon, 10% spandex (seamless knit)"]],[["Куртка","90 % нейлон, 10 % спандекс (бесшовное полотно)"]],[["Күрте","90 % нейлон, 10 % спандекс (тігіссіз тоқыма)"]]),
+  build:L4(["Tejido sin costuras, ajustado con ligera compresión","Cremallera completa y cuello alto","Agujeros antideslizantes para los pulgares","Largo a la cintura con bajo curvo","No transparenta, secado rápido"],
+           ["Seamless knit, slim fit with light compression","Full zip and stand collar","Non-slip thumb holes","Waist length with a curved hem","Non-see-through, quick-dry"],
+           ["Бесшовное полотно, по фигуре с лёгкой компрессией","Молния во всю длину и воротник-стойка","Нескользящие отверстия для пальцев","Длина до талии, закруглённый низ","Не просвечивает, быстро сохнет"],
+           ["Тігіссіз тоқыма, жеңіл қысатын, денеге қонымды","Толық сыдырма және тік жаға","Тайғанамайтын бармақ тесіктері","Бел ұзындығы, доғал етек","Мөлдір емес, тез кебеді"])}
+};
+const CARE=L4(["Lavar a máquina en frío","No usar lejía","No lavar en seco","No planchar"],["Machine wash cold","Do not bleach","Do not dry clean","Do not iron"],["Машинная стирка в холодной воде","Не отбеливать","Не подвергать химчистке","Не гладить"],["Салқын суда машинамен жуу","Ағартпаңыз","Химиялық тазаламаңыз","Үтіктемеңіз"]);
+for(const id in DET){const g=CATALOG.find(x=>x.id===id); if(!g) continue; const d=DET[id]; if(d.name) g.name=d.name; if(d.set) g.set=true; g.now=true; g.det=d;}
+{ const i=CATALOG.findIndex(g=>g.id==="track"); if(i>=0) CATALOG.splice(i,1); }
+CATALOG.find(g=>g.id==="jumpsuit").variants=[{c:"uva",top:"#4B2340",leg:"#4B2340",photos:[]}];
+COLN.uva={es:"Uva",en:"Grape",ru:"Виноградный",kk:"Жүзім"};
 const SIZES_AVAIL=["S","M"];
 /* Prices: complete sets 65 $ in Venezuela; Kazakhstan at the exchange rate (edit USD_KZT when it moves) */
 const USD_KZT=465, SET_USD=65;
@@ -4398,7 +4448,7 @@ CATALOG.forEach(g=>g.variants.forEach(v=>{
   const name={}; ["es","en","ru","kk"].forEach(l=>name[l]=`${g.name} · ${COLN[v.c][l]}`);
   CONFIG.shop.products.push({id:`${g.id}-${v.c}`,group:g.id,name,cname:COLN[v.c],top:v.top,leg:v.leg,style:g.style,wear:!g.acc,acc:!!g.acc,
     photos:v.photos,price:g.set?SET_PRICE:{kz:"",ve:"",es:""},url:"",kaspi:"",
-    info:{desc:g.desc,feat:g.feat,fabric:g.fabric||null,sizes:g.acc?[]:SIZES_AVAIL}});
+    info:{desc:g.desc,feat:g.feat,fabric:g.fabric||null,sizes:g.acc?[]:SIZES_AVAIL,det:g.det||null},now:!!g.now});
 }));
 CONFIG.shop.bestseller="lounge-negro";
 CONFIG.outfit.set="lounge-negro";
@@ -4413,6 +4463,10 @@ const CAT_T={
  ru:{sizes_av:"Доступные размеры",acc_t:"Аксессуары",price_ask:"Цена: напишите нам",shop_sub:"Настоящие комплекты CORE. Смотрите фото, выбирайте цвет и примеряйте на девушке из приложения.",one_size:"Единый размер",wear_none:"Аксессуар"},
  kk:{sizes_av:"Қолжетімді өлшемдер",acc_t:"Аксессуарлар",price_ask:"Бағасы: бізге жазыңыз",shop_sub:"CORE-дың нағыз жиынтықтары. Фотоларды қарап, түсін таңдап, қолданбадағы қызға кигізіп көріңіз.",one_size:"Бір өлшем",wear_none:"Аксессуар"}
 };
+Object.assign(CAT_T.es,{comp_t:"Composición",build_t:"Confección y detalles",care_t:"Cuidados",sizeg_t:"Guía de tallas",sizeg_b:"Disponible en S y M. ¿Dudas con tu talla? Escríbenos tus medidas (pecho, cintura y cadera) y te decimos cuál te queda mejor.",sizeg_msg:"Hola, quiero saber qué talla me queda. Mis medidas son:",now_t:"Disponibles ahora",more_t:"Más sets CORE",more_b:"Pregúntanos por la disponibilidad."});
+Object.assign(CAT_T.en,{comp_t:"Composition",build_t:"Construction & details",care_t:"Care",sizeg_t:"Size guide",sizeg_b:"Available in S and M. Not sure about your size? Send us your measurements (bust, waist and hips) and we'll tell you which fits best.",sizeg_msg:"Hi, I'd like to know my size. My measurements are:",now_t:"Available now",more_t:"More CORE sets",more_b:"Ask us about availability."});
+Object.assign(CAT_T.ru,{comp_t:"Состав",build_t:"Пошив и детали",care_t:"Уход",sizeg_t:"Размерная сетка",sizeg_b:"Есть размеры S и M. Сомневаетесь? Пришлите свои мерки (грудь, талия, бёдра), и мы подскажем размер.",sizeg_msg:"Здравствуйте, помогите подобрать размер. Мои мерки:",now_t:"В наличии",more_t:"Другие комплекты CORE",more_b:"Уточняйте наличие."});
+Object.assign(CAT_T.kk,{comp_t:"Құрамы",build_t:"Тігілуі мен бөлшектері",care_t:"Күтім",sizeg_t:"Өлшем кестесі",sizeg_b:"S және M өлшемдері бар. Өлшеміңізге сенімсізсіз бе? Өлшемдеріңізді (кеуде, бел, жамбас) жіберіңіз, қайсысы жарасатынын айтамыз.",sizeg_msg:"Сәлеметсіз бе, өлшем таңдауға көмектесіңіз. Менің өлшемдерім:",now_t:"Қазір бар",more_t:"Басқа CORE жиынтықтары",more_b:"Бар-жоғын сұраңыз."});
 for(const l in CAT_T) if(T[l]) Object.assign(T[l],CAT_T[l]);
 
 /* embedded media (works without the img folder) */
@@ -4469,7 +4523,8 @@ function vShop(){
   const best=CONFIG.shop.bestseller, bg=productById(best).group, sets=CATALOG.filter(g=>!g.acc).sort((x,y)=>(y.id===bg)-(x.id===bg)), acc=CATALOG.filter(g=>g.acc);
   return `<div class="hero"><span class="eyebrow">core. activewear</span><h1>${t("shop_t")}</h1><p class="muted">${t("shop_sub")}</p>
     <div class="chips"><button type="button" class="chip best" data-product="${best}">${t("best_btn")}</button><button type="button" class="chip plain" data-act="toOutfit">#COREoutfit</button></div></div>
-  ${sets.map(shopCard).join("")}
+  <h2 class="sec-t">${t("now_t")}</h2>${sets.filter(g=>g.now).map(shopCard).join("")}
+  ${sets.some(g=>!g.now)?`<h2 class="sec-t">${t("more_t")}</h2><p class="small muted">${t("more_b")}</p>${sets.filter(g=>!g.now).map(shopCard).join("")}`:""}
   ${acc.length?`<h2 class="sec-t">${t("acc_t")}</h2>${acc.map(shopCard).join("")}`:""}
   ${outfitSection()}`;
 }
@@ -4484,10 +4539,16 @@ function vProduct(){
     <p class="small">${esc(info.desc[S.lang]||info.desc.es)}</p>
     <div class="field"><span class="qlabel">${t("colors")}: ${esc(p.cname[S.lang]||p.cname.es)}</span><div class="swrow">${vs.map(q=>swatch(q,q.id===p.id,"data-product")).join("")}</div></div>
     <div class="field"><span class="qlabel">${t("sizes_av")}</span><div class="chips">${info.sizes.length?info.sizes.map(s=>`<span class="chip">${s}</span>`).join(""):`<span class="chip plain">${t("one_size")}</span>`}</div></div>
-    <div class="field"><span class="qlabel">${t("details")}</span><ul class="list small">${(info.feat[S.lang]||info.feat.es).map(x=>`<li>${esc(x)}</li>`).join("")}${info.fabric?`<li>${t("fabric")}: ${esc(info.fabric[S.lang]||info.fabric.es)}</li>`:""}</ul></div>
+    <div class="field"><span class="qlabel">${t("details")}</span><ul class="list small">${(info.feat[S.lang]||info.feat.es).map(x=>`<li>${esc(x)}</li>`).join("")}${info.fabric&&!info.det?`<li>${t("fabric")}: ${esc(info.fabric[S.lang]||info.fabric.es)}</li>`:""}</ul></div>
+    ${info.det?detBlock(info.det):""}
     <div class="inline">${p.wear?`<button type="button" class="btn ${on?"":"ghost"} sm" data-outfit-set="${p.id}">${on?"✓ "+t("shop_wearing"):t("shop_wear")}</button>`:""}${shopLinks(p)}</div>
   </div>`;
 }
+function detBlock(d){const L=S.lang, pick=o=>o[L]||o.es;
+  return `<details class="pdet" open><summary>${t("comp_t")}</summary><ul class="list small">${pick(d.comp).map(([k,v])=>`<li><b>${esc(k)}:</b> ${esc(v)}</li>`).join("")}</ul></details>
+  <details class="pdet"><summary>${t("build_t")}</summary><ul class="list small">${pick(d.build).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>
+  <details class="pdet"><summary>${t("care_t")}</summary><ul class="list small">${pick(CARE).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></details>
+  <details class="pdet"><summary>${t("sizeg_t")}</summary><p class="small muted">${t("sizeg_b")}</p>${CONFIG.whatsapp?`<a class="btn ghost sm" href="https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(t("sizeg_msg"))}">${t("shop_ask")}</a>`:""}</details>`;}
 function shopStrip(){
   const cur=productById(S.outfit), best=productById(CONFIG.shop.bestseller), vs=variantsOf(cur);
   return `<div class="card shopstrip"><div class="rowline"><div><span class="eyebrow">${t("shop_strip")}</span><h3>${esc(pName(cur))}</h3></div>
